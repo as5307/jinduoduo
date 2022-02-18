@@ -31,7 +31,6 @@ var userName = "as5307"
 
 var repository = "jinduoduo"
 
-
 var serverList = [
     {
         title: "无障碍服务",
@@ -154,10 +153,11 @@ ui.layout(
         </vertical>
     </drawer>
 );
+initJs();
 
 initUI();
 
-// isShow();
+isShow();
 
 activity.setSupportActionBar(ui.toolbar);
 
@@ -215,24 +215,24 @@ ui.server_menu.on("item_bind", function (itemView, itemHolder) {
     })
 })
 
-// //录制脚本
-// ui.record_menu.on("item_bind", function (itemView, itemHolder) {
-//     itemView.isShow.on("check", function (checked) {
-//         var item = itemHolder.item;
-//         switch (item.title) {
-//             case "悬浮窗":
-//                 if (checked) {
-//                     fb.show();
-//                 } else {
-//                     fb.hide();
-//                 }
-//                 break;
-//             case "音量下键关闭":
+//录制脚本
+ui.record_menu.on("item_bind", function (itemView, itemHolder) {
+    itemView.isShow.on("check", function (checked) {
+        var item = itemHolder.item;
+        switch (item.title) {
+            case "悬浮窗":
+                if (checked) {
+                    fb.show();
+                } else {
+                    fb.hide();
+                }
+                break;
+            case "音量下键关闭":
 
-//                 break;
-//         }
-//     })
-// })
+                break;
+        }
+    })
+})
 
 // 当用户回到本界面时，resume事件会被触发
 ui.emitter.on("resume", function () {
@@ -374,14 +374,14 @@ function add(val, data) {
     }
 }
 
-// function isShow() {
-//     if (auto.service != null) {
-//         autoDialog.hide();
-//     } else {
-//         autoDialog.show();
-//         toast("已开启无障碍服务");
-//     }
-// }
+function isShow() {
+    if (auto.service != null) {
+        autoDialog.hide();
+    } else {
+        autoDialog.show();
+        toast("已开启无障碍服务");
+    }
+}
 
 //根据id找控件点击
 function findIdClick(b_id) {
@@ -449,59 +449,62 @@ function findImage(gameName, imgName, rate, a, b) {
 //初始化ui界面
 function initUI() {
 
-    // //悬浮框
-    // require("sdcard/脚本/金多多挂机/FloatButton/FloatButton.js");
+    //悬浮框
+    fb = new FloatButton();
+    fb.setIcon('http://www.autojs.org/assets/uploads/profile/3-profileavatar.png');
+    fb.setAllButtonSize(50)
+    rb = fb.addItem('run');
+    rb.setIcon('@drawable/ic_play_arrow_black_48dp');
+    rb.setTint('#FFFFFF');
+    rb.setColor('#41A4F5');
+    rb.onClick((view, name, state) => {
+        if (isRun) {
+            rb.setIcon('@drawable/ic_play_arrow_black_48dp');
+            rb.setTint('#FFFFFF');
+            rb.setColor('#41A4F5');
+            console.log("点击停止");
+            suspend = true;
+            isRun = false;
+            closeCurrentPackage();
+        } else {
+            if (runGameList.length != 0) {
+                isRun = true;
+                suspend = false;
 
-    // fb = new FloatButton();
-    // fb.setIcon('http://www.autojs.org/assets/uploads/profile/3-profileavatar.png');
-    // fb.setAllButtonSize(50)
-    // rb = fb.addItem('run');
-    // rb.setIcon('@drawable/ic_play_arrow_black_48dp');
-    // rb.setTint('#FFFFFF');
-    // rb.setColor('#41A4F5');
-    // rb.onClick((view, name, state) => {
-    //     if (isRun) {
-    //         rb.setIcon('@drawable/ic_play_arrow_black_48dp');
-    //         rb.setTint('#FFFFFF');
-    //         rb.setColor('#41A4F5');
-    //         console.log("点击停止");
-    //         suspend = true;
-    //         isRun = false;
-    //         closeCurrentPackage();
-    //     } else {
-    //         if (runGameList.length != 0) {
-    //             isRun = true;
-    //             suspend = false;
+                var pattern = ui.sp1.getSelectedItemPosition();
 
-    //             var pattern = ui.sp1.getSelectedItemPosition();
+                console.log("选中" + pattern);
 
-    //             console.log("选中" + pattern);
-
-    //             switch (pattern) {
-    //                 case 0:
-    //                     var inputTime = Math.pow(2, 100);
-    //                     console.log(inputTime)
-    //                     gameThread(inputTime);
-    //                     break;
-    //                 case 1:
-    //                     var text = ui.runTime.text();
-    //                     var inputTime = parseInt(text);
-    //                     gameThread(inputTime);
-    //                     break;
-    //             }
-    //             console.log("点击运行");
-    //         } else {
-    //             toast("没有选择执行的脚本")
-    //         }
-    //     }
-
-    //     return true;
-    // })
-    // fb.show();
-    // initAutoDialog();
-    // addGameList();
+                switch (pattern) {
+                    case 0:
+                        var inputTime = Math.pow(2, 100);
+                        console.log(inputTime)
+                        gameThread(inputTime);
+                        break;
+                    case 1:
+                        var text = ui.runTime.text();
+                        var inputTime = parseInt(text);
+                        gameThread(inputTime);
+                        break;
+                }
+                console.log("点击运行");
+            } else {
+                toast("没有选择执行的脚本")
+            }
+        }
+        return true;
+    })
+    fb.show();
+    initAutoDialog();
+    addGameList();
 }
 
+//引用js
+function initJs() {
+    require("/sdcard/脚本/金多多挂机/jinduoduo-main/FloatButton/FloatButton.js");
+    require("/sdcard/脚本/金多多挂机/jinduoduo-main/bmob.js");
+    require("/sdcard/脚本/金多多挂机/jinduoduo-main/FloatButton/game.js");
+}
 //初始化无障碍弹窗
 function initAutoDialog() {
     autoDialog = dialogs.build({
@@ -592,53 +595,7 @@ function addGameList() {
     })
 }
 
-function Game(appName, packageName, color, isClickable) {
-    this.appName = appName;
-    this.packageName = packageName;
-    this.color = color;
-    this.isClickable = isClickable;
-}
-function Bmob(url, appId, restKey) {
-    this.baseUrl = url;
-    this.appId = appId;
-    this.restKey = restKey;
 
-    Bmob.prototype.makeRequest = function (method, url, json, callback) {
-        url = this.baseUrl + url;
-        var options = {};
-        options.contentType = "application/json";
-        options.method = method;
-        if (json) {
-            options.body = JSON.stringify(json);
-        }
-        options.headers = {
-            "X-Bmob-Application-Id": this.appId,
-            "X-Bmob-REST-API-Key": this.restKey,
-            "Content-Type": "application/json"
-        }
-        return http.request(url, options, callback);
-    }
-
-    Bmob.prototype.timestamp = function () {
-        return this.makeRequest("GET", "/timestamp", null).body.json();
-    }
-    Bmob.prototype.createObject = function (className, data) {
-        return this.makeRequest("POST", "/classes/" + className, data).body.json();
-    }
-    Bmob.prototype.getObjects = function (className) {
-        return this.makeRequest("GET", "/classes/" + className).body.json();
-    }
-    Bmob.prototype.getObject = function (className, id) {
-        return this.makeRequest("GET", "/classes/" + className + "/" + id).body.json();
-    }
-    Bmob.prototype.updateObject = function (className, data) {
-        return this.makeRequest("PUT", "/classes/" + className + "/" + data.objectId, data).body.json();
-    }
-    Bmob.prototype.deleteObject = function (className, data) {
-        var id = typeof (data) == "string" ? data : data.objectId;
-        return this.makeRequest("DELETE", "/classes/" + className + "/" + id).body.json();
-    }
-}
 
 //是否等待
 function isWait() {
