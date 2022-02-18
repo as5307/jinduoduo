@@ -2,7 +2,7 @@ function Bmob(url, appId, restKey) {
     this.baseUrl = url;
     this.appId = appId;
     this.restKey = restKey;
-
+    
     Bmob.prototype.makeRequest = function (method, url, json, callback) {
         url = this.baseUrl + url;
         var options = {};
@@ -39,3 +39,4 @@ function Bmob(url, appId, restKey) {
         return this.makeRequest("DELETE", "/classes/" + className + "/" + id).body.json();
     }
 }
+module.exports=Bmob;
