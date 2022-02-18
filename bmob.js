@@ -39,4 +39,4 @@ function Bmob(url, appId, restKey) {
         return this.makeRequest("DELETE", "/classes/" + className + "/" + id).body.json();
     }
 }
-module.exports=Bmob;
+module.exports;
