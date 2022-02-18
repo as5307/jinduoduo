@@ -4,4 +4,4 @@ function Game(appName, packageName, color, isClickable) {
     this.color = color;
     this.isClickable = isClickable;
 }
-module.exports=Game;
+module.exports;
