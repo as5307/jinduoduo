@@ -564,7 +564,7 @@ function initData() {
     var bmob = new Bmob("https://api2.bmob.cn/1","a4a599f95c785c5dcc649a6973bfbc78", "90827b1b837cc3d1b02fde1b2d7b81da");
 
     var thread = threads.start(function () {
-        var result = bmob.findAll("GameApp").result;
+        var result = bmob.findAll("GameApp").results;
 
         for (var index = 0; index < result.length; index++) {
             var element = result[index];
