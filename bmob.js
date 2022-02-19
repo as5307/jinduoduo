@@ -14,7 +14,7 @@ function Bmob(url, appId, restKey) {
         options.headers = {
             "X-Bmob-Application-Id": this.appId,
             "X-Bmob-REST-API-Key": this.restKey,
-            "Content-Type": "application/xml"
+            "Content-Type": "application/json"
         }
         return http.request(url, options, callback);
     }
@@ -26,7 +26,7 @@ function Bmob(url, appId, restKey) {
         return this.makeRequest("POST", "/classes/" + className, data).body.json();
     }
     Bmob.prototype.findAll = function (className) {
-        return this.makeRequest("GET", "/classes/" + className+"?order=-createdAt").body.json();
+        return this.makeRequest("GET", "/classes/" + className).body.json();
     }
     Bmob.prototype.findIdObject = function (className, id) {
         return this.makeRequest("GET", "/classes/" + className + "/" + id).body.json();
