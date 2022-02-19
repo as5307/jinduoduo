@@ -14,7 +14,7 @@ function Bmob(url, appId, restKey) {
         options.headers = {
             "X-Bmob-Application-Id": this.appId,
             "X-Bmob-REST-API-Key": this.restKey,
-            "Content-Type": "application/json"
+            "Content-Type": "application/xml"
         }
         return http.request(url, options, callback);
     }
