@@ -1,7 +1,7 @@
 "ui";
 require("/sdcard/脚本/金多多挂机/jinduoduo-main/FloatButton/FloatButton.js");
-var Bmob=require("/sdcard/脚本/金多多挂机/jinduoduo-main/bmob.js");
-var Game=require("/sdcard/脚本/金多多挂机/jinduoduo-main/game.js");
+var Bmob = require("/sdcard/脚本/金多多挂机/jinduoduo-main/bmob.js");
+var Game = require("/sdcard/脚本/金多多挂机/jinduoduo-main/game.js");
 var game = storages.create("game");
 game.put("isShow", true);
 game.put("model", 0);
@@ -17,8 +17,6 @@ var packageName;
 var appName;
 
 var runThread;
-var startTime;
-var endTime;
 var runTime;
 
 var index;
@@ -28,10 +26,7 @@ var isSingle = true;
 
 var rb;
 
-
-var userName = "as5307"
-
-var repository = "jinduoduo"
+var ifshow = false;
 
 var serverList = [
     {
@@ -80,6 +75,8 @@ var otherList = [
         icon: "@drawable/ic_android_black_48dp"
     }
 ];
+var downGameList = [];
+var noDownGameList = [];
 var gameList = [];
 var runGameList = [];
 
@@ -91,33 +88,42 @@ ui.layout(
                 <tabs id="tabs" />
             </appbar>
             <viewpager id="viewpager">
-                <vertical >
-                    <list id="gameList" layout_weight="1" bg="#FAF0E6" >
-                        <card w="*" h="55" margin="10 5" cardCornerRadius="2dp" layout_gravity="center" id="gameCard" bg="{{this.color}}" >
+                <frame >
+                    <vertical >
+                        <list id="gameList" layout_weight="1" bg="#FAF0E6" >
+                            <card w="*" h="55" margin="10 5" cardCornerRadius="2dp" layout_gravity="center" id="gameCard" bg="{{this.color}}" >
+                                <horizontal h="*" >
+                                    <View bg="#4caf50" h="*" w="10" />
+                                    <checkbox id="game1" clickable="{{this.isClickable}}" textSize="20" text="{{this.appName}}" layout_gravity="center" layout_weight="1" />
+                                    <input id="runTime" type="number" w="auto" text="30" layout_gravity="center" />
+                                    <text text="分钟" layout_gravity="center" />
+                                    <button text="脚本配置" id="btn_set" layout_gravity="center" margin="5" w="50" textSize="10" />
 
-                            <horizontal h="*" >
-                                <View bg="#4caf50" h="*" w="10" />
-                                <checkbox id="game1" clickable="{{this.isClickable}}" textSize="20" text="{{this.appName}}" layout_gravity="center" layout_weight="1" />
-                                <input id="runTime" type="number" w="auto" text="30" layout_gravity="center" />
-                                <text text="分钟" layout_gravity="center" />
-                                <button text="脚本配置" id="btn_set" layout_gravity="center" margin="5" w="50" textSize="10" />
-
-                                <button text="清除数据" layout_gravity="center" margin="5" w="50" textSize="10" />
-                            </horizontal>
+                                    <button text="清除数据" layout_gravity="center" margin="5" w="50" textSize="10" />
+                                </horizontal>
 
 
-                        </card>
+                            </card>
 
-                    </list>
-                    <horizontal padding="5">
-                        <img src="@drawable/ic_autorenew_black_48dp" margin="5" />
-                        <spinner id="sp1" entries="单个循环|顺序循环" />
-                        <button id="startGame" text="开始运行" layout_gravity="bottom" style="Widget.AppCompat.Button.Colored" />
-                    </horizontal>
-                </vertical>
+                        </list>
+                        <horizontal  >
+                            <spinner id="sp1" entries="单个循环|顺序循环" layout_weight="1" />
+                            <button id="startGame" text="开始运行" layout_weight="1" />
+                            <button id="refresh" text="刷新列表" layout_weight="1" />
+                        </horizontal>
+                    </vertical>
+
+                    <linear w="*" h="*" bg="#a0000000" id="dialogs" gravity="center" visibility="gone">
+                        <vertical w="300" h="500" bg="#ffffff" padding="10">
+
+                        </vertical>
+                    </linear>
+
+                </frame>
                 <frame>
                     <text text="项目配置" />
                 </frame>
+
             </viewpager>
         </vertical>
         <vertical layout_gravity="left" bg="#ffffff" w="280">
@@ -249,6 +255,17 @@ ui.startGame.on("click", () => {
     // viewUtil.setChecked(true);
 })
 
+
+ui.dialogs.click(function () {
+    if (!ifshow) {
+        ui.dialogs.setVisibility(0);
+        ifshow = false;
+    } else {
+        ui.dialogs.setVisibility(8);
+        ifshow = true;
+    }
+})
+
 //检测是否在游戏界面
 function isGame(packageName) {
     if (currentPackage() != getAppName(packageName)) {
@@ -271,8 +288,6 @@ function gameThread(inputTime) {
         };
         for (index = 0; index < runGameList.length; index++) {
             console.log("执行第" + index + "个");
-            startTime = new Date().getTime();
-            endTime = new Date().getTime();
             runTime = 0;
             while (runTime < inputTime * 60) {
                 element = runGameList[index];
@@ -280,39 +295,38 @@ function gameThread(inputTime) {
                 appName = element.appName;
                 console.log(appName);
                 isGame(packageName);
-                endTime = new Date().getTime();
-                runTime = Math.floor((endTime - startTime) / 1000);
-                console.log("运行时间" + runTime + "s");
+                runTime = runTime + 1000;
+                console.log("运行时间" + runTime / 1000 + "s");
                 switch (appName) {
                     case "中青看点":
-                        if (game.get("model") == 0) {
-                            for (var i = 1; i < 1000; i++) {
-                                sleep(8000)
-                                findIdClick("xx");
-                                findIdClick("arj");
-                                index = random(1000, 5000);
-                                slideScreenDown(device.width / 2, device.height * 0.8, device.width / 2, device.height * 0.1, index, 1);
-                                findTextClick("android.view.View", "查看全文，奖励更多");
-                                slideScreenDown(device.width / 2, device.height * 0.8, device.width / 2, device.height * 0.1, index, 2);
-                                slideScreenDown(device.width / 2, device.height * 0.1, device.width / 2, device.height * 0.8, index, 3);
-                                back();
-                                sleep(2000)
-                                slideScreenDown(device.width / 2, device.height * 0.8, device.width / 2, device.height * 0.1, 400.1);
-                            }
-                        }
+                        // if (game.get("model") == 0) {
+                        //     for (var i = 1; i < 1000; i++) {
+                        //         sleep(8000)
+                        //         findIdClick("xx");
+                        //         findIdClick("arj");
+                        //         index = random(1000, 5000);
+                        //         slideScreenDown(device.width / 2, device.height * 0.8, device.width / 2, device.height * 0.1, index, 1);
+                        //         findTextClick("android.view.View", "查看全文，奖励更多");
+                        //         slideScreenDown(device.width / 2, device.height * 0.8, device.width / 2, device.height * 0.1, index, 2);
+                        //         slideScreenDown(device.width / 2, device.height * 0.1, device.width / 2, device.height * 0.8, index, 3);
+                        //         back();
+                        //         sleep(2000)
+                        //         slideScreenDown(device.width / 2, device.height * 0.8, device.width / 2, device.height * 0.1, 400.1);
+                        //     }
+                        // }
 
-                        if (game.get("model") == 1) {
-                            for (var i = 1; i < 1000; i++) {
-                                sleep(8000)
-                                findIdClick("y0");
-                                clickScreen(0.5, 0.5);
-                                index = random(60000, 100000);
-                                sleep(index);
-                                back();
-                                sleep(2000)
-                                slideScreenDown(device.width / 2, device.height * 0.8, device.width / 2, device.height * 0.1, 400, 1);
-                            }
-                        }
+                        // if (game.get("model") == 1) {
+                        //     for (var i = 1; i < 1000; i++) {
+                        //         sleep(8000)
+                        //         findIdClick("y0");
+                        //         clickScreen(0.5, 0.5);
+                        //         index = random(60000, 100000);
+                        //         sleep(index);
+                        //         back();
+                        //         sleep(2000)
+                        //         slideScreenDown(device.width / 2, device.height * 0.8, device.width / 2, device.height * 0.1, 400, 1);
+                        //     }
+                        // }
                         break;
                 }
             }
@@ -323,7 +337,6 @@ function gameThread(inputTime) {
 
 //勾选的游戏的监听
 ui.gameList.on("item_bind", function (itemView, itemHolder) {
-
     itemView.game1.on("check", (checked) => {
         var position = itemHolder.position;
 
@@ -335,7 +348,6 @@ ui.gameList.on("item_bind", function (itemView, itemHolder) {
             remove(gameList[position].appName)
             console.log("选中删除")
         }
-        console.log(runGameList.length);
     })
 
     itemView.btn_set.on("click", () => {
@@ -345,8 +357,8 @@ ui.gameList.on("item_bind", function (itemView, itemHolder) {
 
         switch (appName) {
             case "中青看点":
-                var items = ["首页", "视频"];
-                initSetDialog(items, position);
+                ui.dialogs.setVisibility(0);
+                ifshow = true
                 break;
         }
     })
@@ -500,8 +512,6 @@ function initUI() {
     initAutoDialog();
 }
 
-
-
 //初始化无障碍弹窗
 function initAutoDialog() {
     autoDialog = dialogs.build({
@@ -521,24 +531,6 @@ function initAutoDialog() {
             game.put("isShow", true);
         }
     });
-}
-
-//初始化配置弹窗
-function initSetDialog(items) {
-    setDialog = dialogs.build({
-        title: "挂机配置",
-        positive: "保存",
-        negative: "取消",
-        items: items,
-        itemsSelectMode: "single",
-        itemsSelectedIndex: game.get("model")
-    }).on("single_choice", (index, item) => {
-
-        console.log("你选择的是" + item);
-
-        game.put("model", index);
-
-    }).show();
 }
 
 //强制关闭应用
@@ -569,12 +561,10 @@ function closeCurrentPackage() {
 //初始化脚本列表数据
 function initData() {
 
-    var bmob = new Bmob("https://api2.bmob.cn/1", "a4a599f95c785c5dcc649a6973bfbc78", "90827b1b837cc3d1b02fde1b2d7b81da");
+    var bmob = new Bmob("https://api2.bmob.cn/1","a4a599f95c785c5dcc649a6973bfbc78", "90827b1b837cc3d1b02fde1b2d7b81da");
 
     var thread = threads.start(function () {
-        var allGame = bmob.getObjects("GameApp");
-
-        var result = allGame.results;
+        var result = bmob.findAll("GameApp").result;
 
         for (var index = 0; index < result.length; index++) {
             var element = result[index];
@@ -582,12 +572,15 @@ function initData() {
             if (getAppName(element.packageName) == null) {
                 color = "#C0C0C0";
                 isClickable = false;
+                downGameList.push(new Game(element.appname, element.packageName, color, isClickable));
             } else {
                 color = "#FFFFFF";
                 isClickable = true;
+                noDownGameList.push(new Game(element.appname, element.packageName, color, isClickable));
             }
-            gameList.push(new Game(element.appname, element.packageName, color, isClickable));
         }
+        gameList=downGameList.concat(noDownGameList);
+        
     })
 }
 
