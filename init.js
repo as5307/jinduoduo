@@ -13,20 +13,30 @@ var setDialog;
 
 var color
 
-var packageName;
+var packageName2;
 var appName;
 
 var runThread;
 var runTime;
+var inputTime;
 
 var index;
-var suspend = false;
+var suspend;
+
+var wait = false;
+
 var isRun = false;
 var isSingle = true;
 
 var rb;
 
-var ifshow = false;
+var isshow = false;
+
+
+var isOpen = false;
+
+var width = device.width;
+var height = device.height;
 
 var serverList = [
     {
@@ -80,6 +90,7 @@ var noDownGameList = [];
 var gameList = [];
 var runGameList = [];
 
+var img;
 ui.layout(
     <drawer id="drawer">
         <vertical>
@@ -99,10 +110,8 @@ ui.layout(
                                     <text text="分钟" layout_gravity="center" />
                                     <button text="脚本配置" id="btn_set" layout_gravity="center" margin="5" w="50" textSize="10" />
 
-                                    <button text="清除数据" layout_gravity="center" margin="5" w="50" textSize="10" />
+                                    <button text="清除数据" id="btm_clean" layout_gravity="center" margin="5" w="50" textSize="10" />
                                 </horizontal>
-
-
                             </card>
 
                         </list>
@@ -251,31 +260,34 @@ ui.emitter.on("resume", function () {
 
 //点击开始按钮 
 ui.startGame.on("click", () => {
-    // let viewUtil = fb.getViewUtil('run');
-    // viewUtil.setChecked(true);
+    startOrStopGame();
 })
 
-
 ui.dialogs.click(function () {
-    if (!ifshow) {
+    if (!isshow) {
         ui.dialogs.setVisibility(0);
-        ifshow = false;
+        isshow = false;
     } else {
         ui.dialogs.setVisibility(8);
-        ifshow = true;
+        isshow = true;
     }
 })
 
 //检测是否在游戏界面
-function isGame(packageName) {
-    if (currentPackage() != getAppName(packageName)) {
+function isGame(b_packageName) {
+    console.log(b_packageName);
+    var main_gameView = packageName(b_packageName).findOnce();
+
+    if (!main_gameView) {
         console.log("返回到本游戏界面");
-        app.launchPackage(packageName);
+        app.launchPackage(packageName2);
+        sleep(5000)
     }
 }
 
 //运行游戏的线程
 function gameThread(inputTime) {
+
     runThread = threads.start(function () {
         var element;
         auto.waitFor();
@@ -286,53 +298,140 @@ function gameThread(inputTime) {
             console.log("请求截图失败");
             exit();
         };
-        for (index = 0; index < runGameList.length; index++) {
-            console.log("执行第" + index + "个");
-            runTime = 0;
-            while (runTime < inputTime * 60) {
-                element = runGameList[index];
-                packageName = element.packageName;
-                appName = element.appName;
-                console.log(appName);
-                isGame(packageName);
-                runTime = runTime + 1000;
-                console.log("运行时间" + runTime / 1000 + "s");
-                switch (appName) {
-                    case "中青看点":
-                        // if (game.get("model") == 0) {
-                        //     for (var i = 1; i < 1000; i++) {
-                        //         sleep(8000)
-                        //         findIdClick("xx");
-                        //         findIdClick("arj");
-                        //         index = random(1000, 5000);
-                        //         slideScreenDown(device.width / 2, device.height * 0.8, device.width / 2, device.height * 0.1, index, 1);
-                        //         findTextClick("android.view.View", "查看全文，奖励更多");
-                        //         slideScreenDown(device.width / 2, device.height * 0.8, device.width / 2, device.height * 0.1, index, 2);
-                        //         slideScreenDown(device.width / 2, device.height * 0.1, device.width / 2, device.height * 0.8, index, 3);
-                        //         back();
-                        //         sleep(2000)
-                        //         slideScreenDown(device.width / 2, device.height * 0.8, device.width / 2, device.height * 0.1, 400.1);
-                        //     }
-                        // }
 
-                        // if (game.get("model") == 1) {
-                        //     for (var i = 1; i < 1000; i++) {
-                        //         sleep(8000)
-                        //         findIdClick("y0");
-                        //         clickScreen(0.5, 0.5);
-                        //         index = random(60000, 100000);
-                        //         sleep(index);
-                        //         back();
-                        //         sleep(2000)
-                        //         slideScreenDown(device.width / 2, device.height * 0.8, device.width / 2, device.height * 0.1, 400, 1);
-                        //     }
-                        // }
-                        break;
-                }
+        for (index = 0; index < runGameList.length;) {
+            console.log("执行第" + index + "个");
+
+            element = runGameList[index];
+            packageName2 = element.packageName;
+            appName = element.appName;
+            console.log(appName + "开始运行");
+
+            switch (appName) {
+                case "阿强消消消":
+                    阿强消消消();
+                    break;
+                case "土豪秒升级":
+                    土豪游戏();
+                    break;
+                case "我就是神豪":
+                    土豪游戏();
+                    break;
+                case "神豪人生":
+                    土豪游戏();
+                    break;
+                case "牛人大作战":
+                    土豪游戏();
+                    break;
+                case "我是学霸":
+                    土豪游戏();
+                    break;
+                case "休闲大师":
+                    土豪游戏();
+                    break;
+                case "一起来冲关":
+                    土豪游戏();
+                    break;
+                case "叫我升级王":
+                    土豪游戏();
+                    break;
             }
+            isWait();
         }
-        console.log("已完成运行");
+
     })
+}
+
+//阿强消消消
+function 阿强消消消() {
+    while (suspend) {
+        isGame(packageName2);
+        runTime = runTime + 1;
+        img = captureScreen();
+        suspend = runTime < inputTime * 60;
+        findImage("阿强消消消", "blue", 0.8, 10, 10);
+        findImage("阿强消消消", "blue2", 0.8, 10, 10);
+        findImage("阿强消消消", "green", 0.8, 10, 10);
+        findImage("阿强消消消", "green2", 0.8, 10, 10);
+        findImage("阿强消消消", "red", 0.8, 10, 10);
+        findImage("阿强消消消", "red2", 0.8, 10, 10);
+        findImage("阿强消消消", "purple", 0.8, 10, 10);
+        findImage("阿强消消消", "purple2", 0.8, 10, 10);
+        findImage("阿强消消消", "yellow", 0.8, 10, 10);
+        findImage("阿强消消消", "yellow2", 0.8, 10, 10);
+        findImage("阿强消消消", "windmill", 0.8, 10, 10);
+        findImage("阿强消消消", "hatchet", 0.8, 10, 10);
+        findImage("阿强消消消", "redenvelope", 0.8, 10, 10);
+        findImage("阿强消消消", "redenvelope2", 0.8, 30, 50);
+        findImage("阿强消消消", "chest", 0.8, 10, 10);
+        findImage("阿强消消消", "open", 0.8, 100, 100);
+        findImage("阿强消消消", "receive", 0.8, 100, 100);
+        findImage("阿强消消消", "receive2", 0.8, 0, 0);
+        findImage("阿强消消消", "rewards", 0.8, 10, 10);
+        findImage("阿强消消消", "close", 0.8, 0, 0);
+        findImage("阿强消消消", "takeit", 0.8, 100, 100);
+        findImage("阿强消消消", "takeit2", 0.8, 100, 100);
+
+        findCustomizClick("android.widget.ImageView", 6, 5);
+        findTextButton("android.view.View", "| 跳过");
+        findCustomizClick("android.widget.ImageView", 4, 3);
+        findTextButton("android.widget.Button", "坚持退出");
+        findTextButton("android.widget.TextView", "放弃奖励离开");
+    }
+}
+//土豪游戏
+function 土豪游戏() {
+    while (suspend) {
+        isGame(packageName2);
+        runTime = runTime + 1;
+        img = captureScreen();
+        suspend = runTime < inputTime * 60;
+        findImage("土豪游戏", "redenvelope", 0.6, 100, 100, width, height);
+        findImage("土豪游戏", "redenvelope3", 0.6, 100, 100, width, height);
+        findImage("土豪游戏", "redenvelope4", 0.6, 100, 100, width, height);
+        findImage("土豪游戏", "redenvelope5", 0.6, 100, 100, width, height);
+        findImage("土豪游戏", "receive", 0.6, 0, 0, width, height);
+        findImage("土豪游戏", "receive3", 0.6, 100, 100, width, height);
+        if (findImage("土豪游戏", "redenvelope2", 0.6, 0, 0, width, height) != null) {
+            sleep(10000);
+            if(app.launchApp("应用商店")){
+                sleep(5000);
+                click(860, 1129);
+               
+            };
+            if (app.launchApp("应用市场")) {
+                sleep(5000);
+                click(72, 1536);
+            };
+            sleep(15000);
+        }
+
+        if (findImage("土豪游戏", "receive4", 0.6, 100, 100) != null || findImage("土豪游戏", "receive6", 0.6, 100, 100) != null) {
+            sleep(10000);
+            click(806, 2224);
+            sleep(10000);
+            click(80, 2180);
+            sleep(5000);
+            click(206, 2252);
+            sleep(5000);
+            click(60, 2220);
+        }
+
+        if (findImage("土豪游戏", "open", 0.6, 50, 50, width, height) != null || findImage("土豪游戏", "open2", 0.6, 50, 50, width, height) != null) {
+            click(device.width / 2, device.height / 2);
+        }
+
+        findImage("土豪游戏", "read", 0.6, 50, 50, width, height);
+
+        findTextButton("android.view.View", "| 跳过");
+        findImage("土豪游戏", "close", 0.6, 0, 0, width, height / 2);
+        findCustomizClick("android.widget.ImageView", 8, 5);
+        findTextButton("android.widget.Button", "继续观看");
+        findImage("土豪游戏", "know", 0.6, 50, 50, width, height);
+        findImage("土豪游戏", "receive2", 0.6, 50, 50, width, height);
+        findImage("土豪游戏", "receive5", 0.6, 50, 50, width, height);
+        findImage("土豪游戏", "receive7", 0.6, 50, 50, width, height);
+    }
 }
 
 //勾选的游戏的监听
@@ -399,66 +498,107 @@ function isShow() {
 }
 
 //根据id找控件点击
-function findIdClick(b_id) {
+function findIdButton(b_id) {
     var main_gameView = id(b_id).findOnce();
+
     if (main_gameView) {
         press(main_gameView.bounds().centerX(), main_gameView.bounds().centerY(), 1);
-        console.log("点击" + main_gameView.text());
-        sleep(2000);
+        console.log("找到id");
+        sleep(1000);
+        runTime = runTime + 1;
+        console.log("运行了" + runTime + "s");
+    }
+}
+
+//根据类名找控件点击
+function findClassNameButton(b_view) {
+    var main_gameView = className(b_view).findOnce();
+
+    if (main_gameView) {
+        press(main_gameView.bounds().centerX(), main_gameView.bounds().centerY(), 1)
+        console.log("找到控件" + main_gameView);
+        sleep(1000);
+        runTime = runTime + 1;
+        console.log("运行了" + runTime + "s");
     }
 }
 
 //根据text找控件点击
-function findTextClick(b_view, b_text) {
+function findTextButton(b_view, b_text) {
     var main_gameView = className(b_view).text(b_text).findOnce();
 
     if (main_gameView) {
         press(main_gameView.bounds().centerX(), main_gameView.bounds().centerY(), 1)
-        console.log("点击文本" + main_gameView);
-        sleep(2000);
+        console.log("找到控件" + main_gameView);
+        sleep(1000);
+        runTime = runTime + 1;
+        console.log("运行了" + runTime + "s");
+    }
+}
+
+//根据子控件找父控件点击
+function findFatherButton(b_view, b_text) {
+
+    var main_gameView = className(b_view).text(b_text).findOnce();
+
+    if (main_gameView) {
+        var parent = main_gameView.parent();
+        press(parent.bounds().centerX(), parent.bounds().centerY(), 1)
+        console.log("找到控件" + main_gameView);
+        sleep(1000);
+        runTime = runTime + 1;
+        console.log("运行了" + runTime + "s");
     }
 }
 
 //根据属性className、classNane、drawOrder找控件点击
-function findOtherClick(b_className, b_className, b_drawingOrder) {
-    var main_gameView = className(b_className).depth(b_className).drawingOrder(b_drawingOrder).findOnce();
+function findCustomizClick(b_className, b_depth, b_drawingOrder) {
+    var main_gameView = className(b_className).depth(b_depth).drawingOrder(b_drawingOrder).findOnce();
     if (main_gameView) {
         press(main_gameView.bounds().centerX(), main_gameView.bounds().centerY(), 1)
-        console.log("关闭点击按钮弹窗2");
-        sleep(2000);
+        console.log("找到控件" + main_gameView);
+        sleep(1000);
+        runTime = runTime + 1;
+        console.log("运行了" + runTime + "s");
+    }
+}
+
+//根据属性className、classNane、drawOrder、desc找控件点击
+function findCustomiz2Click(b_className, b_depth, b_drawingOrder, b_desc) {
+    var main_gameView = className(b_className).depth(b_depth).drawingOrder(b_drawingOrder).desc(b_desc).findOnce();
+    if (main_gameView) {
+        press(main_gameView.bounds().centerX(), main_gameView.bounds().centerY(), 1)
+        console.log("找到控件" + main_gameView);
+        sleep(1000);
+        runTime = runTime + 1;
+        console.log("运行了" + runTime + "s");
     }
 }
 
 //找图方法
-function findImage(gameName, imgName, rate, a, b) {
-    var img = captureScreen();
-
-    var imgPath = "/sdcard/脚本/金多多挂机/res/" + gameName + "/" + imgName + ".jpg";
-
-    console.log(imgPath);
-
+function findImage(gameName, imgName, rate, a, b, r_width, r_height) {
+    console.log("找图：" + imgName);
+    var imgPath = "/sdcard/脚本/金多多挂机/jinduoduo-main/res/" + gameName + "/" + imgName + ".jpg";
     var templ = images.read(imgPath);
 
-    var x = device.width / 1080;
-    var y = device.height / 2400;
-    var temp2 = images.scale(templ, x, y);
-
-    var result = images.matchTemplate(img, temp2, {
+    var result = images.matchTemplate(img, templ, {
         threshold: rate,
-        region: [0, 0, device.width, device.height],
-        max: 5
+        region: [0, 0, r_width, r_height]
     });
 
-    if (result) {
+    if (result.matches.length != 0) {
         for (var index = 0; index < result.matches.length; index++) {
             var pp = result.matches[index].point;
+            console.log("找到图片坐标" + imgName + pp.x + "," + pp.y);
             click(pp.x + a, pp.y + b);
-            console.log("找到点击" + imgName + pp);
-            sleep(2000)
+            return pp;
         }
-    } else {
-        console.log("未找到" + imgName);
     }
+    sleep(100);
+    runTime = runTime + 1;
+    console.log("运行了" + runTime + "s");
+
+    return null;
 }
 
 //初始化ui界面
@@ -472,44 +612,61 @@ function initUI() {
     rb.setTint('#FFFFFF');
     rb.setColor('#41A4F5');
     rb.onClick((view, name, state) => {
-        if (isRun) {
-            rb.setIcon('@drawable/ic_play_arrow_black_48dp');
-            rb.setTint('#FFFFFF');
-            rb.setColor('#41A4F5');
-            console.log("点击停止");
-            suspend = true;
-            isRun = false;
-            closeCurrentPackage();
-        } else {
-            if (runGameList.length != 0) {
-                isRun = true;
-                suspend = false;
-
-                var pattern = ui.sp1.getSelectedItemPosition();
-
-                console.log("选中" + pattern);
-
-                switch (pattern) {
-                    case 0:
-                        var inputTime = Math.pow(2, 100);
-                        console.log(inputTime)
-                        gameThread(inputTime);
-                        break;
-                    case 1:
-                        var text = ui.runTime.text();
-                        var inputTime = parseInt(text);
-                        gameThread(inputTime);
-                        break;
-                }
-                console.log("点击运行");
-            } else {
-                toast("没有选择执行的脚本")
-            }
-        }
+        startOrStopGame();
         return true;
     })
     fb.show();
     initAutoDialog();
+}
+
+
+//开始运行或者停止运行游戏
+function startOrStopGame() {
+    if (isRun) {
+        console.log("点击停止");
+        ui.startGame.setText("开始运行");;
+        rb.setIcon('@drawable/ic_play_arrow_black_48dp');
+        rb.setTint('#FFFFFF');
+        rb.setColor('#41A4F5');
+
+        suspend = false;
+        isRun = false;
+
+        wait = true;
+
+        closeCurrentPackage();
+    } else {
+        console.log("点击运行");
+        if (runGameList.length != 0) {
+
+            isRun = true;
+            wait = false;
+            suspend = true;
+
+            ui.startGame.setText("停止运行");;
+
+            var pattern = ui.sp1.getSelectedItemPosition();
+
+            console.log("选中" + pattern);
+            var text = ui.runTime.text();
+            inputTime = parseInt(text);
+            runTime = 0;
+
+
+            switch (pattern) {
+                case 0:
+                    index = 0;
+                    gameThread(inputTime);
+                    break;
+                case 1:
+                    gameThread(inputTime);
+                    break;
+            }
+
+        } else {
+            toast("没有选择执行的脚本")
+        }
+    }
 }
 
 //初始化无障碍弹窗
@@ -536,9 +693,9 @@ function initAutoDialog() {
 //强制关闭应用
 function closeCurrentPackage() {
     threads.start(function () {
-        console.log("应用包名" + packageName);
-        app.openAppSetting(packageName);
-        text(app.getAppName(packageName)).waitFor();
+        console.log("应用包名" + 2);
+        app.openAppSetting(packageName2);
+        text(app.getAppName(packageName2)).waitFor();
 
         var is_sure = textMatches(/(.*强.*|.*停.*|.*结.*|.*行.*)/).clickable(true).findOnce();
 
@@ -561,10 +718,13 @@ function closeCurrentPackage() {
 //初始化脚本列表数据
 function initData() {
 
-    var bmob = new Bmob("https://api2.bmob.cn/1","a4a599f95c785c5dcc649a6973bfbc78", "90827b1b837cc3d1b02fde1b2d7b81da");
+    var bmob = new Bmob("https://api2.bmob.cn/1", "a4a599f95c785c5dcc649a6973bfbc78", "90827b1b837cc3d1b02fde1b2d7b81da");
 
     var thread = threads.start(function () {
+
         var result = bmob.findAll("GameApp").results;
+
+        console.log("返回数据" + result);
 
         for (var index = 0; index < result.length; index++) {
             var element = result[index];
@@ -572,24 +732,33 @@ function initData() {
             if (getAppName(element.packageName) == null) {
                 color = "#C0C0C0";
                 isClickable = false;
-                downGameList.push(new Game(element.appname, element.packageName, color, isClickable));
+
+                noDownGameList.push(new Game(element.appname, element.packageName, color, isClickable));
             } else {
                 color = "#FFFFFF";
                 isClickable = true;
-                noDownGameList.push(new Game(element.appname, element.packageName, color, isClickable));
+                downGameList.push(new Game(element.appname, element.packageName, color, isClickable));
             }
+
         }
-        gameList=downGameList.concat(noDownGameList);
-        
+        for (var i = 0; i < downGameList.length; i++) {
+            gameList.push(downGameList[i]);
+        }
+        for (var j = 0; j < noDownGameList.length; j++) {
+            gameList.push(noDownGameList[j]);
+        }
+
     })
 }
 
 //是否等待
 function isWait() {
-    while (suspend) {
-        console.log("暂停中。。。");
+    index++;
+    suspend = true;
+    while (wait) {
+        sleep(1000);
+        console.log("等待中。。。");
         index = 0;
-        sleep(10000);
     }
 }
 
@@ -611,7 +780,7 @@ function clickScreen(sc_x, sc_y) {
 function slideScreenDown(startX, startY, endX, endY, pressTime, second) {
     for (let index = 0; index < second; index++) {
         swipe(startX, startY, endX, endY, pressTime);
-        sleep(2000);
+        sleep(100);
     }
 }
 
