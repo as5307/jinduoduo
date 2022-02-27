@@ -396,12 +396,7 @@ function 土豪游戏() {
             sleep(10000);
             if(app.launchApp("应用商店")){
                 sleep(5000);
-                click(860, 1129);
-               
-            };
-            if (app.launchApp("应用市场")) {
-                sleep(5000);
-                click(72, 1536);
+                click(860, 1129);            
             };
             sleep(15000);
         }
