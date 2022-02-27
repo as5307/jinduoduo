@@ -286,7 +286,7 @@ function isGame(b_packageName) {
 }
 
 //运行游戏的线程
-function gameThread(inputTime) {
+function gameThread(inputTime,model) {
 
     runThread = threads.start(function () {
         var element;
@@ -336,7 +336,7 @@ function gameThread(inputTime) {
                     土豪游戏();
                     break;
             }
-            isWait();
+            isWait(model);
         }
 
     })
@@ -647,14 +647,12 @@ function startOrStopGame() {
             inputTime = parseInt(text);
             runTime = 0;
 
-
             switch (pattern) {
                 case 0:
-                    index = 0;
-                    gameThread(inputTime);
+                    gameThread(inputTime,0);
                     break;
                 case 1:
-                    gameThread(inputTime);
+                    gameThread(inputTime,1);
                     break;
             }
 
@@ -747,9 +745,12 @@ function initData() {
 }
 
 //是否等待
-function isWait() {
-    index++;
-    suspend = true;
+function isWait(model) {
+    if (model==0) {
+        index = 0;
+    }else{
+        index++; 
+    }
     while (wait) {
         sleep(1000);
         console.log("等待中。。。");
