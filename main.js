@@ -1,11 +1,9 @@
-
 threads.start(main);
 
 function main() {
     var initjs=downGithubZip("https://codeload.github.com/as5307/jinduoduo/zip/refs/heads/main");
     engines.execScript("运行脚本",initjs); 
 }
-
 /**通过get请求从GitHub下载zip文件*/
 function downGithubZip(githubUrl) {
     try {
@@ -39,7 +37,7 @@ function saveMobilePhone(zipFile) {
 function unzip(path) {
     var zipFolderPath = path.replace(".zip", "") + "/";
     com.stardust.io.Zip.unzip(new java.io.File(path), new java.io.File(zipFolderPath));
-    console.log("解压后的路径"+zipFolderPath);
+    consolle.log("解压后的路径"+zipFolderPath);
     files.removeDir(files.cwd() + "/" + "金多多挂机.zip");
     return  files.read("/sdcard/脚本/金多多挂机/jinduoduo-main/init.js");
 }
