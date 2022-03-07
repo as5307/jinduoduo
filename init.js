@@ -17,8 +17,11 @@ var packageName2;
 var appName;
 
 var runThread;
-var runTime;
+var timeInterval;
 var inputTime;
+var startTime;
+
+var endTime;
 
 var index;
 var suspend;
@@ -30,13 +33,20 @@ var isSingle = true;
 
 var rb;
 
-var isshow = false;
+// var isshow = false;
 
 
 var isOpen = false;
 
+var thread;
+
 var width = device.width;
+
+
 var height = device.height;
+
+
+
 
 var serverList = [
     {
@@ -99,42 +109,56 @@ ui.layout(
                 <tabs id="tabs" />
             </appbar>
             <viewpager id="viewpager">
-                <frame >
-                    <vertical >
-                        <list id="gameList" layout_weight="1" bg="#FAF0E6" >
+                <vertical>
+                    <frame layout_weight="1" bg="#FAF0E6" >
+                        <list id="gameList" >
                             <card w="*" h="55" margin="10 5" cardCornerRadius="2dp" layout_gravity="center" id="gameCard" bg="{{this.color}}" >
                                 <horizontal h="*" >
                                     <View bg="#4caf50" h="*" w="10" />
-                                    <checkbox id="game1" clickable="{{this.isClickable}}" textSize="20" text="{{this.appName}}" layout_gravity="center" layout_weight="1" />
-                                    <input id="runTime" type="number" w="auto" text="30" layout_gravity="center" />
-                                    <text text="分钟" layout_gravity="center" />
-                                    <button text="脚本配置" id="btn_set" layout_gravity="center" margin="5" w="50" textSize="10" />
-
-                                    <button text="清除数据" id="btm_clean" layout_gravity="center" margin="5" w="50" textSize="10" />
+                                    <checkbox id="game1" clickable="{{this.isClickable}}" textSize="20" text="{{this.appName}}" layout_gravity="center" layout_weight="2" />
+                                    <horizontal id="control" visibility="{{this.isControl}}">
+                                        <button text="脚本配置" id="btn_set" layout_gravity="center" margin="5" />
+                                        <button text="清除数据" id="btm_clean" layout_gravity="center" margin="5" />
+                                    </horizontal>
+                                    <button text="下载游戏" id="btn_down" visibility="{{this.isDown}}" />
                                 </horizontal>
                             </card>
-
                         </list>
-                        <horizontal  >
+
+                        <linear w="*" h="*" bg="#FAF0E6" id="dialogs" visibility="gone">
+                            <vertical w="*">
+                                <text text="运行时间(分钟)" />
+                                <input w="*" inputType="number" id="inputTime" />
+                               
+                                <horizontal layout_gravity="bottom">
+                                <button id="back" text="返回列表" layout_weight="1"  />
+                                <button id="save" text="保存配置" layout_weight="1"  />
+                                </horizontal>
+                            </vertical>
+
+                        </linear>
+
+                        <linear w="*" h="*" bg="#FAF0E6" id="refresh" gravity="center" visibility="gone">
+                            <vertical w="100" h="100" padding="10" >
+                                <progressbar />
+                            </vertical>
+                        </linear>
+                    </frame>
+
+                    <horizontal>
+                        <horizontal id="control2">
                             <spinner id="sp1" entries="单个循环|顺序循环" layout_weight="1" />
                             <button id="startGame" text="开始运行" layout_weight="1" />
                             <button id="refresh" text="刷新列表" layout_weight="1" />
                         </horizontal>
-                    </vertical>
-
-                    <linear w="*" h="*" bg="#a0000000" id="dialogs" gravity="center" visibility="gone">
-                        <vertical w="300" h="500" bg="#ffffff" padding="10">
-
-                        </vertical>
-                    </linear>
-
-                </frame>
+                    </horizontal>
+                </vertical>
                 <frame>
                     <text text="项目配置" />
                 </frame>
 
             </viewpager>
-        </vertical>
+        </vertical >
         <vertical layout_gravity="left" bg="#ffffff" w="280">
             <img w="280" h="150" scavarype="fitXY" src="http://images.shejidaren.com/wp-content/uploads/2014/10/023746fki.jpg" />
 
@@ -168,7 +192,7 @@ ui.layout(
                 </horizontal>
             </list>
         </vertical>
-    </drawer>
+    </drawer >
 );
 
 initUI();
@@ -263,16 +287,10 @@ ui.startGame.on("click", () => {
     startOrStopGame();
 })
 
-ui.dialogs.click(function () {
-    if (!isshow) {
-        ui.dialogs.setVisibility(0);
-        isshow = false;
-    } else {
-        ui.dialogs.setVisibility(8);
-        isshow = true;
-    }
+ui.refresh.click(function () {
+    gameList = [];
+    initData();
 })
-
 //检测是否在游戏界面
 function isGame(b_packageName) {
     console.log(b_packageName);
@@ -286,7 +304,7 @@ function isGame(b_packageName) {
 }
 
 //运行游戏的线程
-function gameThread(inputTime,model) {
+function gameThread(model) {
 
     runThread = threads.start(function () {
         var element;
@@ -305,12 +323,10 @@ function gameThread(inputTime,model) {
             element = runGameList[index];
             packageName2 = element.packageName;
             appName = element.appName;
-            console.log(appName + "开始运行");
+            inputTime=game.get(appName);
+            console.log("开始运行"+appName +inputTime+"分钟");
 
             switch (appName) {
-                case "阿强消消消":
-                    阿强消消消();
-                    break;
                 case "土豪秒升级":
                     土豪游戏();
                     break;
@@ -326,13 +342,7 @@ function gameThread(inputTime,model) {
                 case "我是学霸":
                     土豪游戏();
                     break;
-                case "休闲大师":
-                    土豪游戏();
-                    break;
-                case "一起来冲关":
-                    土豪游戏();
-                    break;
-                case "叫我升级王":
+                case "一字之差":
                     土豪游戏();
                     break;
             }
@@ -342,119 +352,93 @@ function gameThread(inputTime,model) {
     })
 }
 
-//阿强消消消
-function 阿强消消消() {
-    while (suspend) {
-        isGame(packageName2);
-        runTime = runTime + 1;
-        img = captureScreen();
-        suspend = runTime < inputTime * 60;
-        findImage("阿强消消消", "blue", 0.8, 10, 10);
-        findImage("阿强消消消", "blue2", 0.8, 10, 10);
-        findImage("阿强消消消", "green", 0.8, 10, 10);
-        findImage("阿强消消消", "green2", 0.8, 10, 10);
-        findImage("阿强消消消", "red", 0.8, 10, 10);
-        findImage("阿强消消消", "red2", 0.8, 10, 10);
-        findImage("阿强消消消", "purple", 0.8, 10, 10);
-        findImage("阿强消消消", "purple2", 0.8, 10, 10);
-        findImage("阿强消消消", "yellow", 0.8, 10, 10);
-        findImage("阿强消消消", "yellow2", 0.8, 10, 10);
-        findImage("阿强消消消", "windmill", 0.8, 10, 10);
-        findImage("阿强消消消", "hatchet", 0.8, 10, 10);
-        findImage("阿强消消消", "redenvelope", 0.8, 10, 10);
-        findImage("阿强消消消", "redenvelope2", 0.8, 30, 50);
-        findImage("阿强消消消", "chest", 0.8, 10, 10);
-        findImage("阿强消消消", "open", 0.8, 100, 100);
-        findImage("阿强消消消", "receive", 0.8, 100, 100);
-        findImage("阿强消消消", "receive2", 0.8, 0, 0);
-        findImage("阿强消消消", "rewards", 0.8, 10, 10);
-        findImage("阿强消消消", "close", 0.8, 0, 0);
-        findImage("阿强消消消", "takeit", 0.8, 100, 100);
-        findImage("阿强消消消", "takeit2", 0.8, 100, 100);
-
-        findCustomizClick("android.widget.ImageView", 6, 5);
-        findTextButton("android.view.View", "| 跳过");
-        findCustomizClick("android.widget.ImageView", 4, 3);
-        findTextButton("android.widget.Button", "坚持退出");
-        findTextButton("android.widget.TextView", "放弃奖励离开");
-    }
-}
 //土豪游戏
 function 土豪游戏() {
     while (suspend) {
         isGame(packageName2);
-        runTime = runTime + 1;
         img = captureScreen();
-        suspend = runTime < inputTime * 60;
-        findImage("土豪游戏", "redenvelope", 0.6, 100, 100, width, height);
-        findImage("土豪游戏", "redenvelope3", 0.6, 100, 100, width, height);
-        findImage("土豪游戏", "redenvelope4", 0.6, 100, 100, width, height);
-        findImage("土豪游戏", "redenvelope5", 0.6, 100, 100, width, height);
-        findImage("土豪游戏", "receive", 0.6, 0, 0, width, height);
-        findImage("土豪游戏", "receive3", 0.6, 100, 100, width, height);
-        if (findImage("土豪游戏", "redenvelope2", 0.6, 0, 0, width, height) != null) {
+        endTime = new Date().getTime();
+        timeInterval = Math.floor((endTime - startTime) / 1000);
+        if (timeInterval > inputTime * 60) {
+            suspend = false;
+        };
+        console.log("运行时间" + timeInterval + "inputTime" + inputTime * 60);
+        findImage("土豪游戏", "redenvelope", 0.6, 100, 100, width, height / 2, true);
+        findImage("土豪游戏", "receive", 0.6, 0, 0, width, height, true);
+
+        if (findImage("土豪游戏", "redenvelope2", 0.6, 0, 0, width, height, false) != null) {
             sleep(10000);
-            if(app.launchApp("应用商店")){
-                sleep(5000);
-                click(860, 1129);            
-            };
-            sleep(15000);
+            app.launchApp("应用商店");
+            app.launchApp("华为应用市场");
+            sleep(8000);
+            findIdButton("search_bar");
+            findIdButton("input_icon");
+            sleep(5000);
+            var et = id("search_src_text").findOnce();
+            if (et != null) {
+                et.setText("垃圾分类指南");
+            }
+            sleep(2000);
+            findIdButton("hwsearchview_search_text_button");
+            findClassNameButton("adnroid.widget.TextView", "垃圾分类指南");
+            sleep(2000);
+            findClassNameButton("adnroid.widget.TextView", "快速查询垃圾分类");
+            sleep(2000)
+            findIdButton("detail_download_button");
+            findIdButton("detail_download_layout");
+            sleep(5000)
         }
 
-        if (findImage("土豪游戏", "receive4", 0.6, 100, 100) != null || findImage("土豪游戏", "receive6", 0.6, 100, 100) != null) {
-            sleep(10000);
-            click(806, 2224);
-            sleep(10000);
-            click(80, 2180);
-            sleep(5000);
-            click(206, 2252);
-            sleep(5000);
-            click(60, 2220);
-        }
-
-        if (findImage("土豪游戏", "open", 0.6, 50, 50, width, height) != null || findImage("土豪游戏", "open2", 0.6, 50, 50, width, height) != null) {
+        if (findImage("土豪游戏", "open", 0.6, 50, 50, width, height, true) != null) {
             click(device.width / 2, device.height / 2);
         }
 
-        findImage("土豪游戏", "read", 0.6, 50, 50, width, height);
-
-        findTextButton("android.view.View", "| 跳过");
-        findImage("土豪游戏", "close", 0.6, 0, 0, width, height / 2);
+        findImage("土豪游戏", "read", 0.6, 0, 0, width / 4, height / 4, true);
+        findTextAndClassButton("android.view.View", "| 跳过");
+        findImage("土豪游戏", "close", 0.8, 0, 0, width, height / 4, true);
         findCustomizClick("android.widget.ImageView", 8, 5);
-        findTextButton("android.widget.Button", "继续观看");
-        findImage("土豪游戏", "know", 0.6, 50, 50, width, height);
-        findImage("土豪游戏", "receive2", 0.6, 50, 50, width, height);
-        findImage("土豪游戏", "receive5", 0.6, 50, 50, width, height);
-        findImage("土豪游戏", "receive7", 0.6, 50, 50, width, height);
+        findTextAndClassButton("android.widget.Button", "继续观看");
+        findTextAndClassButton("android.widget.TextView", "抓住奖励机会");
+        findImage("土豪游戏", "know", 0.6, 50, 50, width, height, true);
+        if (findImage("土豪游戏", "receive2", 0.6, 0, 0, width, height, false) != null) {
+            findImage("土豪游戏", "receive2", 0.6, 50, 50, width, height, true);
+            var packname = getPackageName("垃圾分类指南");
+            console.log("应用包名" + packname);
+            if (packname != null) {
+                sleep(5000);
+                app.openAppSetting(packname);
+                sleep(5000);
+                findIdButton("action_menu_item_child_icon");
+                findIdButton("left_button");
+                sleep(5000);
+                findIdButton("button1");
+                sleep(5000);
+            }
+        };
     }
 }
 
 //勾选的游戏的监听
 ui.gameList.on("item_bind", function (itemView, itemHolder) {
+
     itemView.game1.on("check", (checked) => {
         var position = itemHolder.position;
 
         if (checked) {
-            runGameList.splice(position, 0, gameList[position]);
-            console.log("选中添加")
-
+            add(gameList[position].appName, gameList[position]);
         } else {
             remove(gameList[position].appName)
-            console.log("选中删除")
         }
     })
 
     itemView.btn_set.on("click", () => {
         var position = itemHolder.position;
+        appName = gameList[position].appName;
+        ui.dialogs.setVisibility(0);
+        ui.control2.setVisibility(8);
+        ui.inputTime.setText(game.get(appName));
+        
 
-        var appName = gameList[position].appName;
-
-        switch (appName) {
-            case "中青看点":
-                ui.dialogs.setVisibility(0);
-                ifshow = true
-                break;
-        }
     })
 })
 
@@ -479,7 +463,7 @@ function add(val, data) {
     if (index > -1) {
         runGameList.splice(index, 0, data);
     } else {
-        runGameList.splice(0, 0, data)
+        runGameList.splice(runGameList.length, 0, data);
     }
 }
 
@@ -491,43 +475,33 @@ function isShow() {
         toast("已开启无障碍服务");
     }
 }
-
 //根据id找控件点击
 function findIdButton(b_id) {
     var main_gameView = id(b_id).findOnce();
-
     if (main_gameView) {
         press(main_gameView.bounds().centerX(), main_gameView.bounds().centerY(), 1);
-        console.log("找到id");
+        console.log("找到控件点击" + "x：" + main_gameView.bounds().centerX() + "y：" + main_gameView.bounds().centerY());
         sleep(1000);
-        runTime = runTime + 1;
-        console.log("运行了" + runTime + "s");
     }
 }
 
 //根据类名找控件点击
 function findClassNameButton(b_view) {
     var main_gameView = className(b_view).findOnce();
-
     if (main_gameView) {
         press(main_gameView.bounds().centerX(), main_gameView.bounds().centerY(), 1)
-        console.log("找到控件" + main_gameView);
+        console.log("找到控件点击" + "x：" + main_gameView.bounds().centerX() + "y：" + main_gameView.bounds().centerY());
         sleep(1000);
-        runTime = runTime + 1;
-        console.log("运行了" + runTime + "s");
     }
 }
 
 //根据text找控件点击
-function findTextButton(b_view, b_text) {
+function findTextAndClassButton(b_view, b_text) {
     var main_gameView = className(b_view).text(b_text).findOnce();
-
     if (main_gameView) {
         press(main_gameView.bounds().centerX(), main_gameView.bounds().centerY(), 1)
-        console.log("找到控件" + main_gameView);
+        console.log("找到控件点击" + "x：" + main_gameView.bounds().centerX() + "y：" + main_gameView.bounds().centerY());
         sleep(1000);
-        runTime = runTime + 1;
-        console.log("运行了" + runTime + "s");
     }
 }
 
@@ -539,10 +513,9 @@ function findFatherButton(b_view, b_text) {
     if (main_gameView) {
         var parent = main_gameView.parent();
         press(parent.bounds().centerX(), parent.bounds().centerY(), 1)
-        console.log("找到控件" + main_gameView);
+        console.log("找到控件点击" + "x：" + main_gameView.bounds().centerX() + "y：" + main_gameView.bounds().centerY());
+
         sleep(1000);
-        runTime = runTime + 1;
-        console.log("运行了" + runTime + "s");
     }
 }
 
@@ -551,28 +524,13 @@ function findCustomizClick(b_className, b_depth, b_drawingOrder) {
     var main_gameView = className(b_className).depth(b_depth).drawingOrder(b_drawingOrder).findOnce();
     if (main_gameView) {
         press(main_gameView.bounds().centerX(), main_gameView.bounds().centerY(), 1)
-        console.log("找到控件" + main_gameView);
+        console.log("找到控件点击" + "x：" + main_gameView.bounds().centerX() + "y：" + main_gameView.bounds().centerY());
         sleep(1000);
-        runTime = runTime + 1;
-        console.log("运行了" + runTime + "s");
-    }
-}
-
-//根据属性className、classNane、drawOrder、desc找控件点击
-function findCustomiz2Click(b_className, b_depth, b_drawingOrder, b_desc) {
-    var main_gameView = className(b_className).depth(b_depth).drawingOrder(b_drawingOrder).desc(b_desc).findOnce();
-    if (main_gameView) {
-        press(main_gameView.bounds().centerX(), main_gameView.bounds().centerY(), 1)
-        console.log("找到控件" + main_gameView);
-        sleep(1000);
-        runTime = runTime + 1;
-        console.log("运行了" + runTime + "s");
     }
 }
 
 //找图方法
-function findImage(gameName, imgName, rate, a, b, r_width, r_height) {
-    console.log("找图：" + imgName);
+function findImage(gameName, imgName, rate, a, b, r_width, r_height, isClick) {
     var imgPath = "/sdcard/脚本/金多多挂机/jinduoduo-main/res/" + gameName + "/" + imgName + ".jpg";
     var templ = images.read(imgPath);
 
@@ -584,17 +542,20 @@ function findImage(gameName, imgName, rate, a, b, r_width, r_height) {
     if (result.matches.length != 0) {
         for (var index = 0; index < result.matches.length; index++) {
             var pp = result.matches[index].point;
-            console.log("找到图片坐标" + imgName + pp.x + "," + pp.y);
-            click(pp.x + a, pp.y + b);
-            return pp;
+            console.log("找到图片" + imgName + pp.x + "," + pp.y);
+            if (isClick) {
+                click(pp.x + a, pp.y + b);
+            } else {
+                return pp;
+            }
         }
     }
-    sleep(100);
-    runTime = runTime + 1;
-    console.log("运行了" + runTime + "s");
+    sleep(500);
 
     return null;
 }
+
+
 
 //初始化ui界面
 function initUI() {
@@ -612,8 +573,22 @@ function initUI() {
     })
     fb.show();
     initAutoDialog();
+
 }
 
+
+ui.back.on("click", function () {
+    ui.control2.setVisibility(0);
+    ui.dialogs.setVisibility(8);
+    console.log("返回列表");
+})
+
+ui.save.on("click", function () {
+    var inputTime = ui.inputTime.text();
+    console.log(inputTime)
+    game.put(appName, inputTime);
+    toast("保存成功");
+})
 
 //开始运行或者停止运行游戏
 function startOrStopGame() {
@@ -643,19 +618,17 @@ function startOrStopGame() {
             var pattern = ui.sp1.getSelectedItemPosition();
 
             console.log("选中" + pattern);
-            var text = ui.runTime.text();
-            inputTime = parseInt(text);
-            runTime = 0;
+        
+            startTime = new Date().getTime();
 
             switch (pattern) {
                 case 0:
-                    gameThread(inputTime,0);
+                    gameThread(0);
                     break;
                 case 1:
-                    gameThread(inputTime,1);
+                    gameThread(1);
                     break;
             }
-
         } else {
             toast("没有选择执行的脚本")
         }
@@ -686,7 +659,7 @@ function initAutoDialog() {
 //强制关闭应用
 function closeCurrentPackage() {
     threads.start(function () {
-        console.log("应用包名" + 2);
+
         app.openAppSetting(packageName2);
         text(app.getAppName(packageName2)).waitFor();
 
@@ -714,25 +687,28 @@ function initData() {
     var bmob = new Bmob("https://api2.bmob.cn/1", "a4a599f95c785c5dcc649a6973bfbc78", "90827b1b837cc3d1b02fde1b2d7b81da");
 
     var thread = threads.start(function () {
+        ui.run(function () {
+            ui.refresh.setVisibility(0);
+        })
 
-        var result = bmob.findAll("GameApp").results;
+        var result = bmob.findAll("Game").results;
 
         console.log("返回数据" + result);
 
         for (var index = 0; index < result.length; index++) {
             var element = result[index];
 
+            game.put(element.appName, "30");
+
             if (getAppName(element.packageName) == null) {
                 color = "#C0C0C0";
                 isClickable = false;
-
-                noDownGameList.push(new Game(element.appname, element.packageName, color, isClickable));
+                noDownGameList.push(new Game(element.appName, element.packageName, color, false, "gone", "visible"));
             } else {
                 color = "#FFFFFF";
                 isClickable = true;
-                downGameList.push(new Game(element.appname, element.packageName, color, isClickable));
+                downGameList.push(new Game(element.appName, element.packageName, color, true, "visible", "gone"));
             }
-
         }
         for (var i = 0; i < downGameList.length; i++) {
             gameList.push(downGameList[i]);
@@ -741,23 +717,30 @@ function initData() {
             gameList.push(noDownGameList[j]);
         }
 
+        sleep(1000);
+
+        ui.run(function () {
+            ui.refresh.setVisibility(8);
+        })
+
+
     })
 }
 
 //是否等待
 function isWait(model) {
-    if (model==0) {
+    if (model == 0) {
         index = 0;
-    }else{
-        index++; 
+    } else {
+        index++;
     }
+    suspend = true;
     while (wait) {
         sleep(1000);
         console.log("等待中。。。");
         index = 0;
     }
 }
-
 /**
  *点击一下屏幕
  */
@@ -777,35 +760,6 @@ function slideScreenDown(startX, startY, endX, endY, pressTime, second) {
     for (let index = 0; index < second; index++) {
         swipe(startX, startY, endX, endY, pressTime);
         sleep(100);
-    }
-}
-
-/**随机点赞并休息一秒 */
-function randomHeart(b_id) {
-    index = random(1, 50);
-    if (index == 6) {
-        var target = id(b_id).findOnce();
-        if (target == null) {
-            return;
-        } else {
-            target.click();
-            sleep(1000);
-            console.log("随机点赞并休息一秒");
-        }
-    }
-}
-
-/**随机并休息一秒 */
-function randomFollow(b_id) {
-    index = random(1, 100);
-    if (index == 66) {
-        var target = id(b_id).findOnce();
-        if (target == null) {
-            return;
-        } else {
-            target.click();
-            sleep(1000);
-        }
     }
 }
 
