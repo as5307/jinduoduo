@@ -112,10 +112,6 @@ ui.layout(
                                 <horizontal h="*" >
                                     <View bg="#4caf50" h="*" w="10" />
                                     <checkbox id="game1" clickable="{{this.isClickable}}" textSize="15" text="{{this.appName}}" layout_gravity="center" layout_weight="2" />
-                                    {/* <horizontal id="control" visibility="{{this.isControl}}">
-                                        <button text="脚本配置" id="btn_set" layout_gravity="center" margin="5" />
-                                        <button text="清除数据" id="btm_clean" layout_gravity="center" margin="5" />
-                                    </horizontal> */}
                                     <button text="下载游戏" id="btn_down" visibility="{{this.isDown}}" />
                                 </horizontal>
                             </card>
@@ -188,8 +184,6 @@ initAutoDialog();
 
 initData();
 
-initKeyDown();
-
 isShow();
 
 activity.setSupportActionBar(ui.toolbar);
@@ -223,7 +217,6 @@ ui.server_menu.on("item_bind", function (itemView, itemHolder) {
 
                 if (!checked && auto.service != null) {
                     auto.service.disableSelf();
-
                     toast("已经关闭无障碍权限");
                 }
                 break;
@@ -264,10 +257,16 @@ ui.record_menu.on("item_bind", function (itemView, itemHolder) {
                 }
                 break;
             case "音量下键关闭":
-                if (checked) {
-                    game.put("down_isShow", true);
+                if (checked && auto.service == null) {
+                    toast("请开启无障碍权限");
+                    itemView.isShow.checked=false;
                 } else {
-                    game.put("down_isShow", false);
+                    if (checked) {
+                        game.put("down_isShow", true);
+                    } else {
+                        game.put("down_isShow", false);
+                    }
+                    initKeyDown();
                 }
                 break;
         }
@@ -335,12 +334,14 @@ function gameThread() {
                 case "美妞求生记":
                     长沙嘟游();
                     break;
+                case "我要修理你":
+                    长沙嘟游();
+                    break;
             }
             isWait();
         }
     })
 }
-
 //土豪游戏
 function 土豪游戏() {
     while (suspend) {
@@ -429,24 +430,21 @@ function 长沙嘟游() {
         pressRect(findTextContains("允许", 1));
         pressRect(findCustomizButton("红包群", 10, 1));
         pressRect(findCustomizButton("世界群", 12, 3));
+        pressRect(findIdButton("closeIv"));
+
         point = findImage("长沙嘟游", "redenvelope", 0.6, 0, 0, d_width, d_height);
         pressPoint(point, 0, 0);
         if (findIdButton("getRedBagIv") != null) {
-            pressRect(findIdButton("getRedBagIv"));
             sleep(5000);
-            if (findIdButton("getRedBagIv") != null) {
-                closeData();
-            }
+            pressRect(findIdButton("getRedBagIv"));
         }
-        
-        pressRect(findIdButton("getRedBagIv"));
         point = findImage("长沙嘟游", "read", 0.6, 0, 0, d_width, d_height);
         if (point != null) {
             click(d_width / 4, d_height * 0.1);
         }
+
         point = findImage("长沙嘟游", "close", 0.6, d_width / 2, 0, d_width / 2, d_height / 5);
         pressPoint(point, 0, 0);
-
         if (findIdButton("sure") != null || findTextButton("坚持退出") != null) {
             pressRect(findIdButton("sure"));
             sleep(2000);
@@ -770,7 +768,6 @@ function initKeyDown() {
         }
     })
 }
-
 //是否等待
 function isWait() {
     while (wait) {
