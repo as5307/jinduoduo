@@ -16,7 +16,7 @@ function main() {
 }
 function startDownload() {
     downloadDialog = dialogs.build({
-        title: "更新资源中...",
+        title:"更新资源中...",
         progress: {
             max: -1,
             horizontal:true
@@ -26,10 +26,8 @@ function startDownload() {
     downloadId = setInterval(() => {
         var p = downloadDialog.getProgress();
         if (isDown) {
-            downloadDialog.setProgress(100);
-            toast("解压完成，打开页面");
-            engines.execScript("init.js", files.read("/sdcard/脚本/金多多挂机/jinduoduo-main/init.js"));
             downloadDialog.dismiss();
+            engines.execScript("init.js", files.read("/sdcard/脚本/金多多挂机/jinduoduo-main/init.js"));
             exit();
         } else {
             downloadDialog.setProgress(p + random(1, 5));
@@ -42,11 +40,12 @@ function downGithubZip(githubUrl) {
         var r = http.get(githubUrl);
         console.info("请求状态码Code", r.statusCode);
         var zipFile = r.body.bytes();
-        console.info("请求状态码Code", zipFile.length);
         if (r.statusCode == 200) {
-            if (game.get("bytesLength") != zipFile.length) {
+            if (game.get("bytesLength")!= zipFile.length) {
                 saveMobilePhone(zipFile);
+                toast("更新完成");
             } else {
+                toast("已是最新");
                 isDown = true;
             }
         } else {
