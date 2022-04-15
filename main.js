@@ -6,6 +6,7 @@ var isUnZip = false;
 var initjs;
 var path;
 var game;
+
 main();
 function main() {
     initStorages();
@@ -41,7 +42,7 @@ function downGithubZip(githubUrl) {
         console.info("请求状态码Code", r.statusCode);
         var zipFile = r.body.bytes();
         if (r.statusCode == 200) {
-            if (game.get("bytesLength")!= zipFile.length) {
+            if (game.get("bytesLength",0)!= zipFile.length) {
                 saveMobilePhone(zipFile);
                 toast("更新完成");
             } else {
@@ -78,5 +79,4 @@ function unzip(path) {
 //初始化本地存储
 function initStorages() {
     game = storages.create("game");
-    game.put("bytesLength", 0);
 }
