@@ -214,7 +214,6 @@ ui.server_menu.on("item_bind", function (itemView, itemHolder) {
                     });
                     toast("请开启无障碍权限")
                 }
-
                 if (!checked && auto.service != null) {
                     auto.service.disableSelf();
                     toast("已经关闭无障碍权限");
@@ -301,6 +300,7 @@ function isBackGame(b_packageName) {
         sleep(3000)
     }
 }
+
 //运行游戏的线程
 function gameThread() {
     runThread = threads.start(function () {
@@ -319,7 +319,6 @@ function gameThread() {
             packageName2 = element.packageName;
             appName = element.appName;
             console.log("开始运行" + appName);
-
             // ui.run(function() {
             //     runTime();
             // })
@@ -347,7 +346,6 @@ function 土豪游戏() {
     while (suspend) {
         isBackGame(packageName2);
         img = captureScreen();
-
         uninstallApp("垃圾分类指南")
         point = findImage("土豪游戏", "redenvelope", 0.6, 0, 0, d_width, d_height / 3);
         pressPoint(point, 100, 100);
@@ -360,7 +358,6 @@ function 土豪游戏() {
             sleep(5000);
             point = findImage("土豪游戏", "receive", 0.6, 0, 0, d_width, d_height);
             pressPoint(point, 0, 0);
-
             img = captureScreen();
             point = findImage("土豪游戏", "redenvelope2", 0.6, 0, 0, d_width, d_height);
             if (point == null) {
@@ -368,7 +365,6 @@ function 土豪游戏() {
                 installApp("垃圾分类指南");
             }
         }
-
         point = findImage("土豪游戏", "open", 0.6, 0, 0, d_width, d_height);
         pressPoint(point, 0, 0);
 
@@ -395,7 +391,6 @@ function 土豪游戏() {
         pressRect(rect);
     };
 }
-
 //快手极速版
 function 快手极速版() {
     while (suspend) {
@@ -420,7 +415,6 @@ function 快手极速版() {
         }
     }
 }
-
 //长沙嘟游
 function 长沙嘟游() {
     while (suspend) {
@@ -443,7 +437,7 @@ function 长沙嘟游() {
             click(d_width / 4, d_height * 0.1);
         }
 
-        point = findImage("长沙嘟游", "close", 0.6, d_width / 2, 0, d_width / 2, d_height / 5);
+        point = findImage("长沙嘟游", "close", 0.6, d_width*0.6, 0, d_width*0.4, d_height / 5);
         pressPoint(point, 0, 0);
         if (findIdButton("sure") != null || findTextButton("坚持退出") != null) {
             pressRect(findIdButton("sure"));
@@ -466,6 +460,7 @@ function uninstallApp(appName) {
         sleep(5000);
     }
 }
+
 //应用市场安装APP
 function installApp(appName) {
     app.launchApp("华为应用市场");
@@ -481,7 +476,6 @@ function installApp(appName) {
     sleep(5000);
     back();
 }
-
 //勾选的游戏的监听
 ui.gameList.on("item_bind", function (itemView, itemHolder) {
     listView.push(itemView);
@@ -532,9 +526,8 @@ function add(val, data) {
 function isShow() {
     if (auto.service != null) {
         autoDialog.hide();
-    } else {
+    } else{
         autoDialog.show();
-        toast("已开启无障碍服务");
     }
 }
 //根据id找控件点击
@@ -607,7 +600,6 @@ function pressRect(rect) {
     }
     sleep(100);
 }
-
 //初始化ui界面
 function initUI() {
     //悬浮框
@@ -622,9 +614,9 @@ function initUI() {
         startOrStopGame();
         return true;
     })
+    
     fb.show();
 }
-
 //开始运行或者停止运行游戏
 function startOrStopGame() {
     if (isRun) {
@@ -666,7 +658,6 @@ function runTime() {
         // }
     }, 1000);
 }
-
 //初始化无障碍弹窗
 function initAutoDialog() {
     autoDialog = dialogs.build({
@@ -687,7 +678,6 @@ function initAutoDialog() {
         }
     });
 }
-
 //强制关闭应用
 function closeCurrentPackage() {
     threads.start(function () {
@@ -699,7 +689,6 @@ function closeCurrentPackage() {
         sleep(1000);
     })
 }
-
 //清除数据
 function closeData() {
     app.openAppSetting(packageName2);
@@ -711,8 +700,8 @@ function closeData() {
     sleep(2000);
     pressRect(findTextButton("确定"));
     sleep("5000");
+    back();
 }
-
 //初始化脚本列表数据
 function initData() {
     var bmob = new Bmob("https://api2.bmob.cn/1", "a4a599f95c785c5dcc649a6973bfbc78", "90827b1b837cc3d1b02fde1b2d7b81da");
@@ -747,7 +736,6 @@ function initData() {
         })
     })
 }
-
 //初始化本地存储
 function initStorages() {
     game = storages.create("game");
@@ -776,7 +764,6 @@ function isWait() {
         index = 0;
     }
 }
-
 /**
  * 屏幕滑动
  */
