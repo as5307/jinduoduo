@@ -64,13 +64,13 @@ function downGithubZip() {
         inStream = conn.getInputStream(); 
         connLength = conn.getContentLength(); 
         fs = new FileOutputStream(filepath);
+        console.log("connLength"+connLength);
         if (game.get("bytesLength", 0) != connLength) {
             testDialog.dismiss();
             downloadDialog.show();
             while ((byteRead = inStream.read(buffer)) != -1) {
                 byteSum += byteRead;
                 fs.write(buffer, 0, byteRead);
-                console.log("connLength"+connLength+"/n"+"byteSum"+byteSum)
                 progress = byteSum/connLength;
                 console.log(progress);
             }
