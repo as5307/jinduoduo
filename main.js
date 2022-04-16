@@ -22,7 +22,7 @@ function startDownload() {
             max: -1,
             horizontal:true
         },
-        autoDismiss: false
+        canceledOnTouchOutside: false
     }).show();
     downloadId = setInterval(() => {
         var p = downloadDialog.getProgress();
@@ -58,7 +58,6 @@ function downGithubZip(githubUrl) {
         exit();
     }
 }
-
 /**将下载好的zip文件保存在手机*/
 function saveMobilePhone(zipFile) {
     path = files.join("/sdcard/脚本", "金多多挂机.zip");
