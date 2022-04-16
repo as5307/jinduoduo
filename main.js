@@ -52,17 +52,16 @@ function startDownload() {
         } else {
             downloadDialog.setProgress((progress * 100).toFixed(1));
         }
-    }, 100);
+    }, 20);
 }
 /**通过get请求从GitHub下载zip文件*/
 function downGithubZip() {
     try {
         testDialog.show();
         var myUrl = new URL(url);
-        var conn = myUrl.openConnection(); 
-        conn.setRequestProperty("Accept-Encoding", "identity");
-        inStream = conn.getInputStream(); 
-        connLength = conn.getContentLength(); 
+        var conn = myUrl.openConnection(); //URLConnection
+        inStream = conn.getInputStream(); //InputStream
+        connLength = conn.getContentLength(); //int
         fs = new FileOutputStream(filepath);
         console.log("是否需要更新"+(game.get("bytesLength", 0) != connLength));
         if (game.get("bytesLength", 0) != connLength) {
