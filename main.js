@@ -60,7 +60,6 @@ function downGithubZip() {
         testDialog.show();
         var myUrl = new URL(url);
         var conn = myUrl.openConnection();
-        conn.setRequestProperty("Accept-Encoding", "gzip, deflate");
         conn.connect();
         inStream = conn.getInputStream(); 
         connLength = conn.getContentLength(); 
@@ -75,6 +74,8 @@ function downGithubZip() {
                 progress = byteSum/connLength;
                 console.log(progress);
             }
+            inStream.close();
+            fs.close();
             game.put("bytesLength", byteSum);
             unzip(filepath);
             toast("更新完成，加载页面中。。。");
