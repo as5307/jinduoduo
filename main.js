@@ -59,9 +59,10 @@ function downGithubZip() {
     try {
         testDialog.show();
         var myUrl = new URL(url);
-        var conn = myUrl.openConnection(); //URLConnection
-        inStream = conn.getInputStream(); //InputStream
-        connLength = conn.getContentLength(); //int
+        var conn = myUrl.openConnection(); 
+        conn.setRequestProperty("Accept-Encoding", "identity");
+        inStream = conn.getInputStream(); 
+        connLength = conn.getContentLength(); 
         fs = new FileOutputStream(filepath);
         console.log("是否需要更新"+(game.get("bytesLength", 0) != connLength));
         if (game.get("bytesLength", 0) != connLength) {
@@ -70,6 +71,7 @@ function downGithubZip() {
             while ((byteRead = inStream.read(buffer)) != -1) {
                 byteSum += byteRead;
                 fs.write(buffer, 0, byteRead);
+                console.log("connLength"+connLength+"/n"+"byteSum"+byteSum)
                 progress = byteSum/connLength;
                 console.log(progress);
             }
