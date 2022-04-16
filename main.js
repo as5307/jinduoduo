@@ -1,81 +1,96 @@
 
+importClass(java.io.FileOutputStream);
+importClass(java.net.URL);
 var downloadDialog = null;
+var testDialog = null;
 var downloadId = -1;
 var isDown = false;
 var isUnZip = false;
 var initjs;
 var path;
 var game;
-
+progress = 0;
+running = false;
+//初始化下载参数
+running = false
+byteSum = 0; //总共读取的文件大小
+byteRead = 0; //每次读取的byte数
+buffer = util.java.array('byte', 1024); //byte[]
+var url = "https://codeload.github.com/as5307/jinduoduo/zip/refs/heads/main";
+var filepath = "/sdcard/脚本/金多多挂机.zip";
 main();
 function main() {
-    initStorages();
-    threads.start(function () {
-        downGithubZip("https://codeload.github.com/as5307/jinduoduo/zip/refs/heads/main")
-    });
+    game = storages.create("game");
     startDownload();
+    threads.start(function () {
+        downGithubZip();
+    });
 }
 function startDownload() {
     downloadDialog = dialogs.build({
-        title:"更新资源中...",
+        title: "下载资源中。。。",
+        progress: {
+            max: 100
+        },
+        canceledOnTouchOutside: false
+    });
+
+    testDialog = dialogs.build({
+        title: "检查资源中...",
         progress: {
             max: -1,
             horizontal:true
         },
         canceledOnTouchOutside: false
-    }).show();
+    });
+
     downloadId = setInterval(() => {
-        var p = downloadDialog.getProgress();
-        if (isDown) {
+        if (progress >= 1) {
             downloadDialog.dismiss();
             engines.execScript("init.js", files.read("/sdcard/脚本/金多多挂机/jinduoduo-main/init.js"));
             exit();
         } else {
-            downloadDialog.setProgress(p + random(1, 5));
+            downloadDialog.setProgress((progress * 100).toFixed(1));
         }
-    }, 200);
+    }, 100);
 }
 /**通过get请求从GitHub下载zip文件*/
-function downGithubZip(githubUrl) {
+function downGithubZip() {
     try {
-        var r = http.get(githubUrl);
-        console.info("请求状态码Code", r.statusCode);
-        var zipFile = r.body.bytes();
-        if (r.statusCode == 200) {
-            if (game.get("bytesLength",0)!= zipFile.length) {
-                saveMobilePhone(zipFile);
-                toast("更新完成");
-            } else {
-                toast("已是最新");
-                isDown = true;
+        testDialog.show();
+        var myUrl = new URL(url);
+        var conn = myUrl.openConnection(); //URLConnection
+        inStream = conn.getInputStream(); //InputStream
+        connLength = conn.getContentLength(); //int
+        fs = new FileOutputStream(filepath);
+        console.log("是否需要更新"+(game.get("bytesLength", 0) != connLength));
+        if (game.get("bytesLength", 0) != connLength) {
+            testDialog.dismiss();
+            downloadDialog.show();
+            while ((byteRead = inStream.read(buffer)) != -1) {
+                byteSum += byteRead;
+                fs.write(buffer, 0, byteRead);
+                progress = byteSum/connLength;
+                console.log(progress);
             }
+            game.put("bytesLength", byteSum);
+            unzip(filepath);
+            toast("更新完成，加载页面中。。。");
         } else {
-            console.error("下载github代码失败,,请检查网络");
-            exit()
+            testDialog.dismiss();
+            toast("已是最新，加载页面中。。。");
+            progress =1;
         }
     } catch (err) {
         console.error(err);
         exit();
     }
 }
-/**将下载好的zip文件保存在手机*/
-function saveMobilePhone(zipFile) {
-    path = files.join("/sdcard/脚本", "金多多挂机.zip");
-    files.createWithDirs(path);
-    console.info("创建好的文件路径path:", path);
-    files.writeBytes(path, zipFile);
-    game.put("bytesLength",zipFile.length);
-    unzip(path);
-}
+
 /**在同一目录解压zip文件*/
 function unzip(path) {
     var zipFolderPath = path.replace(".zip", "") + "/";
     com.stardust.io.Zip.unzip(new java.io.File(path), new java.io.File(zipFolderPath));
     files.removeDir(files.cwd() + "/" + "金多多挂机.zip");
-    isDown=true;
 }
 
-//初始化本地存储
-function initStorages() {
-    game = storages.create("game");
-}
