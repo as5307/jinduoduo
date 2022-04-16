@@ -8,8 +8,8 @@
   "icon": "res/logo.png",
 
   "launchConfig": {
-    "displaySplash": false,
-    "hideLogs": false, 
+    "displaySplash": true,
+    "hideLogs": true, 
     "splashIcon": "res/bg.jpg", 
     "splashText": "欢迎使用金多多挂机", 
     "stableMode": false 
