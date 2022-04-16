@@ -6,6 +6,14 @@
   },
   "useFeatures": [],
   "icon": "res/logo.png",
+
+  "launchConfig": {
+    "displaySplash": true,
+    "hideLogs": false, 
+    "splashIcon": "res/bg.jpg", 
+    "splashText": "欢迎使用金多多挂机", 
+    "stableMode": false 
+},
   "main": "main.js",
   "name": "金多多挂机",
   "packageName": "com.jinduoduo.guaji",
