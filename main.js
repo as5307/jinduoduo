@@ -59,11 +59,11 @@ function downGithubZip() {
     try {
         testDialog.show();
         var myUrl = new URL(url);
-        var conn = myUrl.openConnection(); //URLConnection
-        inStream = conn.getInputStream(); //InputStream
-        connLength = conn.getContentLength(); //int
+        var conn = myUrl.openConnection();
+        conn.setRequestProperty("Accept-Encoding", "identity");
+        inStream = conn.getInputStream(); 
+        connLength = conn.getContentLength(); 
         fs = new FileOutputStream(filepath);
-        console.log("是否需要更新"+(game.get("bytesLength", 0) != connLength));
         if (game.get("bytesLength", 0) != connLength) {
             testDialog.dismiss();
             downloadDialog.show();
