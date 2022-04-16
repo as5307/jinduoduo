@@ -10,10 +10,10 @@ var game;
 main();
 function main() {
     initStorages();
-     startDownload();
     threads.start(function () {
         downGithubZip("https://codeload.github.com/as5307/jinduoduo/zip/refs/heads/main")
     });
+    startDownload();
 }
 function startDownload() {
     downloadDialog = dialogs.build({
