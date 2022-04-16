@@ -258,7 +258,7 @@ ui.record_menu.on("item_bind", function (itemView, itemHolder) {
             case "音量下键关闭":
                 if (checked && auto.service == null) {
                     toast("请开启无障碍权限");
-                    itemView.isShow.checked=false;
+                    itemView.isShow.checked = false;
                 } else {
                     if (checked) {
                         game.put("down_isShow", true);
@@ -319,9 +319,6 @@ function gameThread() {
             packageName2 = element.packageName;
             appName = element.appName;
             console.log("开始运行" + appName);
-            // ui.run(function() {
-            //     runTime();
-            // })
 
             switch (appName) {
                 case "快手极速版":
@@ -420,28 +417,45 @@ function 长沙嘟游() {
     while (suspend) {
         isBackGame(packageName2);
         img = captureScreen();
+        uninstallApp("垃圾分类指南");
         pressRect(findIdButton("btn"));
         pressRect(findTextContains("允许", 1));
         pressRect(findCustomizButton("红包群", 10, 1));
         pressRect(findCustomizButton("世界群", 12, 3));
-        pressRect(findIdButton("closeIv"));
 
         point = findImage("长沙嘟游", "redenvelope", 0.6, 0, 0, d_width, d_height);
         pressPoint(point, 0, 0);
-        if (findIdButton("getRedBagIv") != null) {
-            sleep(5000);
-            pressRect(findIdButton("getRedBagIv"));
-        }
-        point = findImage("长沙嘟游", "read", 0.6, 0, 0, d_width, d_height);
+
+        point = findImage("长沙嘟游", "redenvelope2", 0.8, 0, 0, d_width, d_height);
         if (point != null) {
-            click(d_width / 4, d_height * 0.1);
+            pressPoint(point, 50, 50);
+            sleep(5000);
+            installApp("垃圾分类指南");
+        } 
+
+        if (findIdButton("getRedBagRl") != null) {
+            sleep(5000);
+            pressRect(findIdButton("getRedBagRl"));
         }
 
-        point = findImage("长沙嘟游", "close", 0.6, d_width*0.6, 0, d_width*0.4, d_height / 5);
+        point = findImage("长沙嘟游", "read", 0.6, 0, 0, d_width, d_height);
+        if (point != null) {
+            click(d_width / 4, d_height * 0.1); 
+        }
+
+        point = findImage("长沙嘟游", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height*0.09);
         pressPoint(point, 0, 0);
+
+        point = findImage("长沙嘟游", "openApp", 0.8, 0, 0, d_width, d_height);
+        pressPoint(point, 50, 50);
+
+        if (findIdButton("open")!=null) {
+            pressRect(findIdButton("open"));
+            closeData();
+        }
+
         if (findIdButton("sure") != null || findTextButton("坚持退出") != null) {
             pressRect(findIdButton("sure"));
-            sleep(2000);
             closeData();
         }
     }
@@ -472,7 +486,9 @@ function installApp(appName) {
         et.setText(appName);
     }
     sleep(2000);
-    pressRect(findTextButton("安装"));
+    if (findTextButton("打开")==null) {
+        pressRect(findTextButton("安装"));
+    }
     sleep(5000);
     back();
 }
@@ -526,7 +542,7 @@ function add(val, data) {
 function isShow() {
     if (auto.service != null) {
         autoDialog.hide();
-    } else{
+    } else {
         autoDialog.show();
     }
 }
@@ -614,7 +630,7 @@ function initUI() {
         startOrStopGame();
         return true;
     })
-    
+
     fb.show();
 }
 //开始运行或者停止运行游戏
