@@ -60,7 +60,8 @@ function downGithubZip() {
         testDialog.show();
         var myUrl = new URL(url);
         var conn = myUrl.openConnection();
-        conn.setRequestProperty("Accept-Encoding", "identity");
+        conn.setRequestProperty("Accept-Encoding", "gzip, deflate");
+        conn.connect();
         inStream = conn.getInputStream(); 
         connLength = conn.getContentLength(); 
         fs = new FileOutputStream(filepath);
