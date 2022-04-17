@@ -191,6 +191,7 @@ function startDownload() {
     downloadId = setInterval(() => {
         if (progress >= 1) {
             downloadDialog.dismiss();
+            downloadDialog=null;
             initFloatDialog();
             initAutoDialog();
             initData();
