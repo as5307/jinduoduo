@@ -1,4 +1,3 @@
-// "ui";
 importClass(java.io.FileOutputStream);
 importClass(java.net.URL);
 downloadDialog = null;
@@ -14,11 +13,7 @@ byteRead = 0; //每次读取的byte数
 buffer = util.java.array('byte', 1024); //byte[]
 url = "https://codeload.github.com/as5307/jinduoduo/zip/refs/heads/main";
 filepath = "/sdcard/脚本/金多多挂机.zip";
-// ui.layout(
-//     <frame height="match_parent" width="match_parent" id="splashIcon">
-//         <img src="file:///sdcard/脚本/金多多挂机/jinduoduo-main/res/splashIcon.png" scaleType="fitCenter" />
-//     </frame>
-// )
+
 main();
 function main() {
     game = storages.create("game");
@@ -43,7 +38,7 @@ function startDownload() {
             horizontal: true
         },
         canceledOnTouchOutside: false
-    }).show();
+    });
 
     downloadId = setInterval(() => {
         if (progress >= 1) {
@@ -59,6 +54,7 @@ function startDownload() {
 /**通过get请求从GitHub下载zip文件*/
 function downGithubZip() {
     try {
+        testDialog.show()
         var myUrl = new URL(url);
         var conn = myUrl.openConnection();
         conn.connect();
