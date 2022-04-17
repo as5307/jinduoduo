@@ -1,13 +1,14 @@
-
+"ui";
+ui.layout(
+    <frame height="match_parent" width="match_parent" >
+        <img src="res/start.png" scaleType="fitCenter" />
+    </frame>
+)
 importClass(java.io.FileOutputStream);
 importClass(java.net.URL);
-var downloadDialog = null;
-var testDialog = null;
-var downloadId = -1;
-var isDown = false;
-var isUnZip = false;
-var initjs;
-var path;
+downloadDialog = null;
+testDialog = null;
+downloadId = -1;
 var game;
 progress = 0;
 running = false;
@@ -16,8 +17,8 @@ running = false
 byteSum = 0; //总共读取的文件大小
 byteRead = 0; //每次读取的byte数
 buffer = util.java.array('byte', 1024); //byte[]
-var url = "https://codeload.github.com/as5307/jinduoduo/zip/refs/heads/main";
-var filepath = "/sdcard/脚本/金多多挂机.zip";
+url = "https://codeload.github.com/as5307/jinduoduo/zip/refs/heads/main";
+filepath = "/sdcard/脚本/金多多挂机.zip";
 main();
 function main() {
     game = storages.create("game");
@@ -39,7 +40,7 @@ function startDownload() {
         title: "检查资源中...",
         progress: {
             max: -1,
-            horizontal:true
+            horizontal: true
         },
         canceledOnTouchOutside: false
     });
@@ -61,16 +62,16 @@ function downGithubZip() {
         var myUrl = new URL(url);
         var conn = myUrl.openConnection();
         conn.connect();
-        inStream = conn.getInputStream(); 
-        connLength = conn.getContentLength(); 
+        inStream = conn.getInputStream();
+        connLength = conn.getContentLength();
         fs = new FileOutputStream(filepath);
-        if (game.get("bytesLength", 0) != connLength &&connLength!=-1) {
+        if (game.get("bytesLength", 0) != connLength && connLength != -1) {
             testDialog.dismiss();
             downloadDialog.show();
             while ((byteRead = inStream.read(buffer)) != -1) {
                 byteSum += byteRead;
                 fs.write(buffer, 0, byteRead);
-                progress = byteSum/connLength;
+                progress = byteSum / connLength;
                 console.log(progress);
             }
             inStream.close();
@@ -81,7 +82,7 @@ function downGithubZip() {
         } else {
             testDialog.dismiss();
             toast("已是最新，加载页面中。。。");
-            progress =1;
+            progress = 1;
         }
     } catch (err) {
         console.error(err);
