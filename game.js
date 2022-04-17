@@ -1,10 +1,8 @@
-function Game(appName, packageName,color,isClickable,isControl,isDown) {
+function Game(appName, packageName,color,isClickable,runTime) {
     this.appName = appName;
     this.packageName = packageName;
     this.color = color;
     this.isClickable = isClickable;
-    this.isControl=isControl;
-    this.isDown=isDown;
+    this.runTime = runTime;
 }
-
 module.exports=Game;
