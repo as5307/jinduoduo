@@ -64,8 +64,7 @@ function downGithubZip() {
         inStream = conn.getInputStream(); 
         connLength = conn.getContentLength(); 
         fs = new FileOutputStream(filepath);
-        console.log("connLength"+connLength);
-        if (game.get("bytesLength", 0) != connLength) {
+        if (game.get("bytesLength", 0) != connLength &&connLength!=-1) {
             testDialog.dismiss();
             downloadDialog.show();
             while ((byteRead = inStream.read(buffer)) != -1) {
