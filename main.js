@@ -30,7 +30,6 @@ function startDownload() {
         },
         canceledOnTouchOutside: false
     });
-
     testDialog = dialogs.build({
         title: "检查资源中...",
         progress: {
@@ -39,12 +38,11 @@ function startDownload() {
         },
         canceledOnTouchOutside: false
     });
-
     downloadId = setInterval(() => {
         if (progress >= 1) {
-            downloadDialog.dismiss();
+            downloadDialog=null;
             engines.execScript("init.js", files.read("/sdcard/脚本/金多多挂机/jinduoduo-main/init.js"));
-            exit();
+            clearInterval(downloadId);
         } else {
             downloadDialog.setProgress((progress * 100).toFixed(1));
         }
