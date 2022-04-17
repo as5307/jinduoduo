@@ -1,45 +1,43 @@
-
 "ui";
 importClass(android.widget.CheckBox);
+importClass(java.io.FileOutputStream);
+importClass(java.net.URL);
 require("/sdcard/脚本/金多多挂机/jinduoduo-main/FloatButton/FloatButton.js");
-var Bmob = require("/sdcard/脚本/金多多挂机/jinduoduo-main/bmob.js");
-var Game = require("/sdcard/脚本/金多多挂机/jinduoduo-main/game.js");
+Bmob = require("/sdcard/脚本/金多多挂机/jinduoduo-main/bmob.js");
+Game = require("/sdcard/脚本/金多多挂机/jinduoduo-main/game.js");
 
 var game;
 var fb;
 var autoDialog;
-var setDialog;
-var color
+var rb;
 
 var packageName2;
 var appName;
+var color
 
 var runThread;
-var timeInterval;
 var inputTime;
-var startTime;
-
-var endTime;
-
 var index;
 var suspend;
+wait = false;
+isRun = false;
 
-var wait = false;
+d_width = device.width;
+d_height = device.height;
 
-var isRun = false;
-var isSingle = true;
-
-var rb;
-var isOpen = false;
-var thread;
-
-var d_width = device.width;
-var d_height = device.height;
-
+downloadDialog = null;
+testDialog = null;
+downloadId = -1;
+progress = 0;
+//初始化下载参数
+byteSum = 0; //总共读取的文件大小
+byteRead = 0; //每次读取的byte数
+buffer = util.java.array('byte', 1024); //byte[]
+url = "https://codeload.github.com/as5307/jinduoduo/zip/refs/heads/main";
+filepath = "/sdcard/脚本/金多多挂机.zip";
 var point;
 var rect;
-
-var listView = [];
+listView = [];
 initStorages();
 
 var serverList = [
@@ -165,30 +163,92 @@ ui.layout(
         </vertical>
     </drawer >
 );
+main();
 
-initUI();
+function main() {
+    game = storages.create("game");
+    startDownload();
+    threads.start(function () {
+        downGithubZip();
+    });
+}
+function startDownload() {
+    downloadDialog = dialogs.build({
+        title: "下载资源中。。。",
+        progress: {
+            max: 100
+        },
+        canceledOnTouchOutside: false
+    });
+    testDialog = dialogs.build({
+        title: "检查资源中...",
+        progress: {
+            max: -1,
+            horizontal: true
+        },
+        canceledOnTouchOutside: false
+    });
+    downloadId = setInterval(() => {
+        if (progress >= 1) {
+            downloadDialog = null;
+            initFloatDialog();
+            initAutoDialog();
+            initData();
+            activity.setSupportActionBar(ui.toolbar);
+            ui.viewpager.setTitles(["推荐项目", "录制脚本"]);
+            ui.tabs.setupWithViewPager(ui.viewpager);
+            ui.toolbar.setupWithDrawer(ui.drawer);
+            ui.server_menu.setDataSource(serverList);
+            ui.gameList.setDataSource(gameList);
+            ui.record_menu.setDataSource(recordList);
+            ui.other_menu.setDataSource(otherList);
+            clearInterval(downloadId);
+        } else {
+            downloadDialog.setProgress((progress * 100).toFixed(1));
+        }
+    }, 20);
+}
 
-initAutoDialog();
-
-initData();
-
-isShow();
-
-activity.setSupportActionBar(ui.toolbar);
-
-ui.viewpager.setTitles(["推荐项目", "录制脚本"]);
-
-ui.tabs.setupWithViewPager(ui.viewpager);
-
-ui.toolbar.setupWithDrawer(ui.drawer);
-
-ui.server_menu.setDataSource(serverList);
-
-ui.gameList.setDataSource(gameList);
-
-ui.record_menu.setDataSource(recordList);
-
-ui.other_menu.setDataSource(otherList);
+/**通过get请求从GitHub下载zip文件*/
+function downGithubZip() {
+    try {
+        testDialog.show()
+        var myUrl = new URL(url);
+        var conn = myUrl.openConnection();
+        conn.connect();
+        inStream = conn.getInputStream();
+        connLength = conn.getContentLength();
+        fs = new FileOutputStream(filepath);
+        if (game.get("bytesLength", 0) != connLength && connLength != -1) {
+            testDialog.dismiss();
+            downloadDialog.show();
+            while ((byteRead = inStream.read(buffer)) != -1) {
+                byteSum += byteRead;
+                fs.write(buffer, 0, byteRead);
+                progress = byteSum / connLength;
+                console.log(progress);
+            }
+            inStream.close();
+            fs.close();
+            game.put("bytesLength", byteSum);
+            unzip(filepath);
+            toast("更新完成，加载页面中。。。");
+        } else {
+            testDialog.dismiss();
+            toast("已是最新，加载页面中。。。");
+            progress = 1;
+        }
+    } catch (err) {
+        console.error(err);
+        exit();
+    }
+}
+/**在同一目录解压zip文件*/
+function unzip(path) {
+    var zipFolderPath = path.replace(".zip", "") + "/";
+    com.stardust.io.Zip.unzip(new java.io.File(path), new java.io.File(zipFolderPath));
+    files.removeDir(files.cwd() + "/" + "金多多挂机.zip");
+}
 
 //服务选择
 ui.server_menu.on("item_bind", function (itemView, itemHolder) {
@@ -280,11 +340,11 @@ ui.startGame.on("click", () => {
 // })
 
 ui.save.click(function () {
-    for (var index = 0;index < listView.length; index++) {
-      var element = listView[index];
-      var runTime=element.inputTime.text();
-      var appName=gameList[index].appName;
-      game.put(gameList[index].appName,runTime)
+    for (var index = 0; index < listView.length; index++) {
+        var element = listView[index];
+        var runTime = element.inputTime.text();
+        var appName = gameList[index].appName;
+        game.put(gameList[index].appName, runTime)
     }
     toast("保存成功")
 })
@@ -297,7 +357,6 @@ function isBackGame(b_packageName) {
         sleep(3000)
     }
 }
-
 //运行游戏的线程
 function gameThread() {
     runThread = threads.start(function () {
@@ -536,13 +595,6 @@ function add(val, data) {
     }
 }
 
-function isShow() {
-    if (auto.service != null) {
-        autoDialog.hide();
-    } else {
-        autoDialog.show();
-    }
-}
 //根据id找控件点击
 function findIdButton(b_id) {
     rect = id(b_id).findOnce();
@@ -614,7 +666,7 @@ function pressRect(rect) {
     sleep(100);
 }
 //初始化ui界面
-function initUI() {
+function initFloatDialog() {
     //悬浮框
     fb = new FloatButton();
     fb.setIcon('http://www.autojs.org/assets/uploads/profile/3-profileavatar.png');
@@ -665,14 +717,14 @@ function runTime(timeout) {
     var id = setInterval(function () {
         i++;
         console.log("运行了" + i + "s");
-        if (i>=timeout*60) {
-            if (pattern==0) {
-                suspend = true; ;   
-            }else{
-                suspend = false; 
+        if (i >= timeout * 60) {
+            if (pattern == 0) {
+                suspend = true;;
+            } else {
+                suspend = false;
             }
         }
-        i=0; 
+        i = 0;
     }, 1000);
 }
 //初始化无障碍弹窗
@@ -694,6 +746,11 @@ function initAutoDialog() {
             game.put("isShow", true);
         }
     });
+    if (auto.service != null) {
+        autoDialog.hide();
+    } else {
+        autoDialog.show();
+    }
 }
 //强制关闭应用
 function closeCurrentPackage() {
@@ -733,11 +790,11 @@ function initData() {
             if (getAppName(element.packageName) == null) {
                 color = "#C0C0C0";
                 isClickable = false;
-                noDownGameList.push(new Game(element.appName, element.packageName, color, false, game.get(element.appName,"30")));
+                noDownGameList.push(new Game(element.appName, element.packageName, color, false, game.get(element.appName, "30")));
             } else {
                 color = "#FFFFFF";
                 isClickable = true;
-                downGameList.push(new Game(element.appName, element.packageName, color, true, game.get(element.appName,"30")));
+                downGameList.push(new Game(element.appName, element.packageName, color, true, game.get(element.appName, "30")));
             }
         }
         for (var i = 0; i < downGameList.length; i++) {
@@ -792,19 +849,3 @@ function slideScreenDown(startX, startY, endX, endY, pressTime, second) {
         sleep(delayTime);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
