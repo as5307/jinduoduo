@@ -191,7 +191,7 @@ function startDownload() {
     downloadId = setInterval(() => {
         if (progress >= 1) {
             downloadDialog.dismiss();
-            downloadDialog=null;
+            clearInterval(downloadId);
             initFloatDialog();
             initAutoDialog();
             initData();
@@ -203,7 +203,6 @@ function startDownload() {
             ui.gameList.setDataSource(gameList);
             ui.record_menu.setDataSource(recordList);
             ui.other_menu.setDataSource(otherList);
-            clearInterval(downloadId);
         } else {
             downloadDialog.setProgress((progress * 100).toFixed(1));
         }
