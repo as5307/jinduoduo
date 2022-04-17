@@ -38,7 +38,7 @@ filepath = "/sdcard/脚本/金多多挂机.zip";
 var point;
 var rect;
 listView = [];
-initStorages();
+initStorages(); 
 
 var serverList = [
     {
@@ -190,7 +190,7 @@ function startDownload() {
     });
     downloadId = setInterval(() => {
         if (progress >= 1) {
-            downloadDialog = null;
+            downloadDialog.dismiss();
             initFloatDialog();
             initAutoDialog();
             initData();
