@@ -38,7 +38,7 @@ filepath = "/sdcard/脚本/金多多挂机.zip";
 var point;
 var rect;
 listView = [];
-initStorages(); 
+initStorages();
 
 var serverList = [
     {
@@ -164,7 +164,6 @@ ui.layout(
     </drawer >
 );
 main();
-
 function main() {
     game = storages.create("game");
     startDownload();
@@ -172,6 +171,7 @@ function main() {
         downGithubZip();
     });
 }
+
 function startDownload() {
     downloadDialog = dialogs.build({
         title: "下载资源中。。。",
@@ -190,8 +190,9 @@ function startDownload() {
     });
     downloadId = setInterval(() => {
         if (progress >= 1) {
-            downloadDialog.dismiss();
             clearInterval(downloadId);
+            downloadDialog.dismiss();
+            downloadDialog = null
             initFloatDialog();
             initAutoDialog();
             initData();
@@ -215,28 +216,32 @@ function downGithubZip() {
         testDialog.show()
         var myUrl = new URL(url);
         var conn = myUrl.openConnection();
+        conn.setRequestProperty("Accept-Encoding", "identity");  
         conn.connect();
-        inStream = conn.getInputStream();
         connLength = conn.getContentLength();
+        inStream = conn.getInputStream();
         fs = new FileOutputStream(filepath);
-        if (game.get("bytesLength", 0) != connLength && connLength != -1) {
-            testDialog.dismiss();
-            downloadDialog.show();
-            while ((byteRead = inStream.read(buffer)) != -1) {
-                byteSum += byteRead;
-                fs.write(buffer, 0, byteRead);
-                progress = byteSum / connLength;
-                console.log(progress);
+        console.log("文件大小"+connLength);
+        if (connLength!=-1) {
+            if (game.get("bytesLength", 0) != connLength) {
+                testDialog.dismiss();
+                downloadDialog.show();
+                while ((byteRead = inStream.read(buffer)) != -1) {
+                    byteSum += byteRead;
+                    fs.write(buffer, 0, byteRead);
+                    progress = byteSum / connLength;
+                    console.log(progress);
+                }
+                inStream.close();
+                fs.close();
+                game.put("bytesLength", byteSum);
+                unzip(filepath);
+                toast("更新完成，加载页面中。。。");
+            } else {
+                testDialog.dismiss();
+                toast("已是最新，加载页面中。。。");
+                progress = 1;
             }
-            inStream.close();
-            fs.close();
-            game.put("bytesLength", byteSum);
-            unzip(filepath);
-            toast("更新完成，加载页面中。。。");
-        } else {
-            testDialog.dismiss();
-            toast("已是最新，加载页面中。。。");
-            progress = 1;
         }
     } catch (err) {
         console.error(err);
@@ -779,7 +784,7 @@ function closeData() {
 //初始化脚本列表数据
 function initData() {
     var bmob = new Bmob("https://api2.bmob.cn/1", "a4a599f95c785c5dcc649a6973bfbc78", "90827b1b837cc3d1b02fde1b2d7b81da");
-    var thread = threads.start(function () {
+    threads.start(function () {
         ui.run(function () {
             ui.refresh.setVisibility(0);
         })

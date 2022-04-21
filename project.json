@@ -1,7 +1,13 @@
 {
+  "main": "main.js",
+  "name": "金多多挂机",
   "ignore": [
     "build"
   ],
+  "packageName": "com.jinduoduo.guaji",
+  "versionCode": 1,
+  "versionName": "1.0.0",
+  "encryptLevel": 1,
   "icon": "res/logo.png",
   "launchConfig": {
     "displaySplash": true,
@@ -10,13 +16,6 @@
     "splashText": "欢迎使用金多多挂机",
     "stableMode": false
   },
-  "main": "main.js",
-  "name": "金多多挂机",
-  "packageName": "com.jinduoduo.guaji",
-  "scripts": {},
-  "versionCode": 1,
-  "versionName": "1.0.0",
-  "encryptLevel": 1,
   "optimization": {
     "removeOpenCv": true,
     "unusedResources": true
