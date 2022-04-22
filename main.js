@@ -1,10 +1,12 @@
 "ui";
 importClass(android.widget.CheckBox);
 importClass(java.io.FileOutputStream);
+importClass(java.io.FileInputStream);
 importClass(java.net.URL);
-require("/sdcard/脚本/金多多挂机/jinduoduo-main/FloatButton/FloatButton.js");
-Bmob = require("/sdcard/脚本/金多多挂机/jinduoduo-main/bmob.js");
-Game = require("/sdcard/脚本/金多多挂机/jinduoduo-main/game.js");
+importClass(java.util.zip.ZipFile);
+importClass(java.util.zip.ZipEntry);
+importClass(java.util.zip.ZipInputStream);
+importClass(java.io.File);
 
 var game;
 var fb;
@@ -28,19 +30,21 @@ d_height = device.height;
 downloadDialog = null;
 testDialog = null;
 downloadId = -1;
-progress = 0;
+downProgress = 0;
+unzipProgress = 0;
 //初始化下载参数
 byteSum = 0; //总共读取的文件大小
 byteRead = 0; //每次读取的byte数
 buffer = util.java.array('byte', 1024); //byte[]
 url = "https://codeload.github.com/as5307/jinduoduo/zip/refs/heads/main";
-filepath = "/sdcard/脚本/金多多挂机.zip";
+zipFilePath = "/sdcard/脚本/jinduoduo-main.zip";
+filePath = "/sdcard/脚本";
 var point;
 var rect;
 listView = [];
+serverItemView = [];
 initStorages();
-
-var serverList = [
+serverList = [
     {
         title: "无障碍服务",
         icon: "@drawable/ic_android_black_48dp",
@@ -49,29 +53,29 @@ var serverList = [
     {
         title: "保持前台服务",
         icon: "@drawable/ic_android_black_48dp",
-        isShow: game.get("reception_isShow")
+        isShow: game.get("reception_isShow", false)
     },
     {
         title: "显示控制台",
         icon: "@drawable/ic_android_black_48dp",
-        isShow: game.get("console_isShow")
+        isShow: game.get("console_isShow", false)
     }
 ];
 
-var recordList = [
+recordList = [
     {
         title: "悬浮窗",
         icon: "@drawable/ic_android_black_48dp",
-        isShow: game.get("dialog_isShow")
+        isShow: game.get("dialog_isShow", true)
     },
     {
         title: "音量下键关闭",
         icon: "@drawable/ic_android_black_48dp",
-        isShow: game.get("down_isShow")
+        isShow: game.get("down_isShow", false)
     }
 ];
 
-var otherList = [
+otherList = [
     {
         title: "主题色",
         icon: "@drawable/ic_android_black_48dp",
@@ -86,10 +90,10 @@ var otherList = [
     }
 ];
 
-var downGameList = [];
-var noDownGameList = [];
-var gameList = [];
-var runGameList = [];
+downGameList = [];
+noDownGameList = [];
+gameList = [];
+checkGameList = [];
 
 var img;
 var pattern;
@@ -125,7 +129,6 @@ ui.layout(
                             <spinner id="spl" entries="单个循环|顺序循环" layout_weight="1" />
                             <button id="startGame" text="开始运行" />
                             <button id="save" text="保存配置" />
-                            {/* <button id="save" text="保存" /> */}
                         </horizontal>
                     </horizontal>
                 </vertical>
@@ -171,7 +174,6 @@ function main() {
         downGithubZip();
     });
 }
-
 function startDownload() {
     downloadDialog = dialogs.build({
         title: "下载资源中。。。",
@@ -189,10 +191,11 @@ function startDownload() {
         canceledOnTouchOutside: false
     });
     downloadId = setInterval(() => {
-        if (progress >= 1) {
+        if (unzipProgress >= 1) {
             clearInterval(downloadId);
             downloadDialog.dismiss();
-            downloadDialog = null
+            downloadDialog = null;
+            initRequire();
             initFloatDialog();
             initAutoDialog();
             initData();
@@ -205,7 +208,11 @@ function startDownload() {
             ui.record_menu.setDataSource(recordList);
             ui.other_menu.setDataSource(otherList);
         } else {
-            downloadDialog.setProgress((progress * 100).toFixed(1));
+            if (downProgress >= 1) {
+                downloadDialog.setProgress((unzipProgress * 100).toFixed(1));
+            } else {
+                downloadDialog.setProgress((downProgress * 100).toFixed(1));
+            }
         }
     }, 20);
 }
@@ -214,49 +221,121 @@ function startDownload() {
 function downGithubZip() {
     try {
         testDialog.show()
-        var myUrl = new URL(url);
-        var conn = myUrl.openConnection();
-        conn.setRequestProperty("Accept-Encoding", "identity");  
+        myUrl = new URL(url);
+        conn = myUrl.openConnection();
         conn.connect();
-        connLength = conn.getContentLength();
         inStream = conn.getInputStream();
-        fs = new FileOutputStream(filepath);
-        console.log("文件大小"+connLength);
-        if (connLength!=-1) {
-            if (game.get("bytesLength", 0) != connLength) {
-                testDialog.dismiss();
-                downloadDialog.show();
-                while ((byteRead = inStream.read(buffer)) != -1) {
-                    byteSum += byteRead;
-                    fs.write(buffer, 0, byteRead);
-                    progress = byteSum / connLength;
-                    console.log(progress);
-                }
-                inStream.close();
-                fs.close();
-                game.put("bytesLength", byteSum);
-                unzip(filepath);
-                toast("更新完成，加载页面中。。。");
-            } else {
-                testDialog.dismiss();
-                toast("已是最新，加载页面中。。。");
-                progress = 1;
-            }
+        fs = new FileOutputStream(zipFilePath);
+        // if (game.get("bytesLength", 0) != 184931) {
+        testDialog.dismiss();
+        downloadDialog.show();
+        while ((byteRead = inStream.read(buffer)) != -1) {
+            byteSum += byteRead;
+            fs.write(buffer, 0, byteRead);
+            downProgress = byteSum / 5050368;
+            // console.log("bytesLength" + byteSum);
         }
+        // game.put("bytesLength", byteSum);
+        inStream.close();
+        fs.close();
+        downloadDialog.setTitle("解压中。。。");
+        unZip(new File(zipFilePath), filePath);
+        // } else {
+        //     testDialog.dismiss();
+        //     toast("已是最新，加载页面中。。。");
+        //     unzipProgress = 1;
+        // }
+
     } catch (err) {
         console.error(err);
-        exit();
     }
 }
-/**在同一目录解压zip文件*/
-function unzip(path) {
-    var zipFolderPath = path.replace(".zip", "") + "/";
-    com.stardust.io.Zip.unzip(new java.io.File(path), new java.io.File(zipFolderPath));
-    files.removeDir(files.cwd() + "/" + "金多多挂机.zip");
+
+/**
+ * 将sourceFile解压到targetDir
+ * @param sourceFile
+ * @param targetDir
+ * @throws RuntimeException
+ */
+function unZip(sourceFile, targetDir) {
+    // start = System.currentTimeMillis();
+    if (!sourceFile.exists()) {
+        throw new FileNotFound
+        Exception("cannot find the file = " + sourceFile.getPath());
+    }
+    try {
+        zipFile = new ZipFile(sourceFile);
+        // console.log("length"+sourceFile.length());
+        entries = zipFile.entries();
+        byteSum = 0;
+        while (entries.hasMoreElements()) {
+            entry = entries.nextElement();
+            if (entry.isDirectory()) {
+                dirPath = targetDir + "/" + entry.getName();
+                // console.log("创建文件夹" + entry.getName())
+                createDirIfNotExist1(dirPath);
+            } else {
+                // console.log("创建文件" + entry.getName())
+                targetFile = new File(targetDir + "/" + entry.getName());
+                createFileIfNotExist(targetFile);
+                is = null;
+                fos = null;
+                try {
+                    is = zipFile.getInputStream(entry);
+                    fos = new FileOutputStream(targetFile);
+                    while ((byteRead = is.read(buffer)) != -1) {
+                        byteSum += byteRead;
+                        fos.write(buffer, 0, byteRead);
+                        unzipProgress = byteSum/90152;
+                    }
+                } finally {
+                    try {
+                        fos.close();
+                    } catch (error) {
+                        log.warn("close FileOutputStream exception", e);
+                    }
+                    try {
+                        is.close();
+                    } catch (error) {
+                        log.warn("close InputStream exception", e);
+                    }
+                }
+            }
+        }
+        log.info("解压完成");
+    } finally {
+        if (zipFile != null) {
+            try {
+                zipFile.close();
+            } catch (error) {
+                log.warn("close zipFile exception", e);
+            }
+        }
+    }
+}
+
+function createDirIfNotExist1(path) {
+    file = new File(path);
+    createDirIfNotExist2(file);
+}
+
+function createDirIfNotExist2(file) {
+    if (!file.exists()) {
+        file.mkdirs();
+    }
+}
+function createFileIfNotExist(file) {
+    createParentDirIfNotExist(file);
+    file.createNewFile();
+}
+
+function createParentDirIfNotExist(file) {
+    createDirIfNotExist2(file.getParentFile());
 }
 
 //服务选择
 ui.server_menu.on("item_bind", function (itemView, itemHolder) {
+    serverItemView.push(itemView);
     itemView.isShow.on("check", function (checked) {
         var item = itemHolder.item;
         switch (item.title) {
@@ -293,7 +372,6 @@ ui.server_menu.on("item_bind", function (itemView, itemHolder) {
         }
     })
 })
-
 //录制脚本
 ui.record_menu.on("item_bind", function (itemView, itemHolder) {
     itemView.isShow.on("check", function (checked) {
@@ -324,10 +402,13 @@ ui.record_menu.on("item_bind", function (itemView, itemHolder) {
         }
     })
 })
+
 // 当用户回到本界面时，resume事件会被触发
 ui.emitter.on("resume", function () {
     // 此时根据无障碍服务的开启情况，同步开关的状态
-    ui.isShow.checked = auto.service != null;
+    if (serverItemView.length > 0) {
+        serverItemView[0].isShow.checked = auto.service != null;
+    }
 });
 
 //点击开始按钮 
@@ -340,7 +421,7 @@ ui.startGame.on("click", () => {
 //     gameList = [];
 //     noDownGameList = [];
 //     downGameList = [];
-//     runGameList = [];
+//     checkGameList = [];
 //     initData();
 // })
 
@@ -353,6 +434,7 @@ ui.save.click(function () {
     }
     toast("保存成功")
 })
+
 //检测是否在游戏界面
 function isBackGame(b_packageName) {
     rect = packageName(b_packageName).findOnce();
@@ -374,9 +456,9 @@ function gameThread() {
             console.log("请求截图失败");
             exit();
         };
-        for (index = 0; index < runGameList.length; index++) {
+        for (index = 0; index < checkGameList.length; index++) {
             console.log("执行第" + index + "个");
-            element = runGameList[index];
+            element = checkGameList[index];
             packageName2 = element.packageName;
             appName = element.appName;
             console.log("开始运行" + appName);
@@ -553,53 +635,40 @@ function installApp(appName) {
     sleep(5000);
     back();
 }
+
 //勾选的游戏的监听
 ui.gameList.on("item_bind", function (itemView, itemHolder) {
     listView.push(itemView);
-    console.log(listView.length);
     itemView.game1.on("check", (checked) => {
         var position = itemHolder.position;
         if (checked) {
             pattern = ui.spl.getSelectedItemPosition();
-            if (pattern == 0) {
-                for (let index = 0; index < listView.length; index++) {
+            for (let index = 0; index < gameList.length; index++) {
+                if (pattern == 0) {
+                    console.log("单个模式");
                     if (index != position) {
                         listView[index].game1.checked = false;
+                    } else {
+                        checkGameList.splice(0, 0, gameList[position]);
+                    }
+                } else {
+                    console.log("多个模式");
+                    if (index == position) {
+                        checkGameList.splice(index, 0, gameList[position]);
                     }
                 }
             }
-            add(gameList[position].appName, gameList[position]);
         } else {
-            remove(gameList[position].appName)
+            console.log("取消勾选");
+            for (let index = 0; index < gameList.length; index++) {
+                if (index == position) {
+                    checkGameList.splice(index, 1);
+                }
+            }
         }
+        // console.log(checkGameList);
     })
 })
-
-function indexOf(val) {
-    for (var index = 0; index < runGameList.length; index++) {
-        if (runGameList[index].appName == val) {
-            return index;
-        }
-    }
-    return -1;
-}
-
-function remove(val) {
-    var index = indexOf(val)
-    if (index > -1) {
-        runGameList.splice(index, 1);
-    }
-}
-
-function add(val, data) {
-    var index = indexOf(val)
-    if (index > -1) {
-        runGameList.splice(index, 0, data);
-    } else {
-        runGameList.splice(runGameList.length, 0, data);
-    }
-}
-
 //根据id找控件点击
 function findIdButton(b_id) {
     rect = id(b_id).findOnce();
@@ -642,7 +711,7 @@ function findCustomizButton(b_text, b_depth, b_drawingOrder) {
 
 //找图方法
 function findImage(gameName, imgName, rate, s_width, s_height, r_width, r_height) {
-    var imgPath = "/sdcard/脚本/金多多挂机/jinduoduo-main/res/" + gameName + "/" + imgName + ".jpg";
+    var imgPath = "/sdcard/脚本/jinduoduo-main/res/" + gameName + "/" + imgName + ".jpg";
     var templ = images.read(imgPath);
     point = images.findImage(img, templ, {
         threshold: rate,
@@ -670,6 +739,7 @@ function pressRect(rect) {
     }
     sleep(100);
 }
+
 //初始化ui界面
 function initFloatDialog() {
     //悬浮框
@@ -684,7 +754,6 @@ function initFloatDialog() {
         startOrStopGame();
         return true;
     })
-
     fb.show();
 }
 //开始运行或者停止运行游戏
@@ -701,7 +770,7 @@ function startOrStopGame() {
         closeCurrentPackage();
     } else {
         console.log("点击运行");
-        if (runGameList.length != 0) {
+        if (checkGameList.length != 0) {
             isRun = true;
             wait = false;
             suspend = true;
@@ -732,11 +801,12 @@ function runTime(timeout) {
         i = 0;
     }, 1000);
 }
+
 //初始化无障碍弹窗
 function initAutoDialog() {
     autoDialog = dialogs.build({
         title: "需要启动无障碍权限服务",
-        content: "软件需要打开无障碍服务才能运行,请在随后的设置中选择Auto.js并开启服务。你也可以稍后在侧拉菜单设置",
+        content: "软件需要打开\"无障碍服务\"才能运行,请在随后的设置中选择Auto.js并开启服务。你也可以稍后在侧拉菜单设置",
         checkBoxPrompt: "不再提示",
         negative: "取消",
         positive: "去设置"
@@ -757,6 +827,7 @@ function initAutoDialog() {
         autoDialog.show();
     }
 }
+
 //强制关闭应用
 function closeCurrentPackage() {
     threads.start(function () {
@@ -768,6 +839,7 @@ function closeCurrentPackage() {
         sleep(1000);
     })
 }
+
 //清除数据
 function closeData() {
     app.openAppSetting(packageName2);
@@ -781,6 +853,7 @@ function closeData() {
     sleep("5000");
     back();
 }
+
 //初始化脚本列表数据
 function initData() {
     var bmob = new Bmob("https://api2.bmob.cn/1", "a4a599f95c785c5dcc649a6973bfbc78", "90827b1b837cc3d1b02fde1b2d7b81da");
@@ -815,16 +888,21 @@ function initData() {
         })
     })
 }
+
 //初始化本地存储
 function initStorages() {
     game = storages.create("game");
-    game.put("dialog_isShow", true);
-    game.put("down_isShow", false);
-    game.put("reception_isShow", false);
-    game.put("console_isShow", false);
     game.put("isShow", true);
-    game.put("model", 0);
 }
+
+
+//引用资源
+function initRequire() {
+    require("/sdcard/脚本/jinduoduo-main/FloatButton/FloatButton.js");
+    Bmob = require("/sdcard/脚本/jinduoduo-main/bmob.js");
+    Game = require("/sdcard/脚本/jinduoduo-main/game.js");
+}
+
 //按音量键下停止脚本运行
 function initKeyDown() {
     events.observeKey();
@@ -835,6 +913,7 @@ function initKeyDown() {
         }
     })
 }
+
 //是否等待
 function isWait() {
     while (wait) {
