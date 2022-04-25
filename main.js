@@ -1,12 +1,4 @@
 "ui";
-importClass(android.widget.CheckBox);
-importClass(java.io.FileOutputStream);
-importClass(java.io.FileInputStream);
-importClass(java.net.URL);
-importClass(java.util.zip.ZipFile);
-importClass(java.util.zip.ZipEntry);
-importClass(java.util.zip.ZipInputStream);
-importClass(java.io.File);
 
 var game;
 var fb;
@@ -27,23 +19,12 @@ isRun = false;
 d_width = device.width;
 d_height = device.height;
 
-downloadDialog = null;
-testDialog = null;
-downloadId = -1;
-downProgress = 0;
-unzipProgress = 0;
-//初始化下载参数
-byteSum = 0; //总共读取的文件大小
-byteRead = 0; //每次读取的byte数
-buffer = util.java.array('byte', 1024); //byte[]
-url = "https://codeload.github.com/as5307/jinduoduo/zip/refs/heads/main";
-zipFilePath = "/sdcard/脚本/jinduoduo-main.zip";
-filePath = "/sdcard/脚本";
 var point;
 var rect;
 listView = [];
 serverItemView = [];
 initStorages();
+
 serverList = [
     {
         title: "无障碍服务",
@@ -166,172 +147,19 @@ ui.layout(
         </vertical>
     </drawer >
 );
-main();
-function main() {
-    game = storages.create("game");
-    startDownload();
-    threads.start(function () {
-        downGithubZip();
-    });
-}
-function startDownload() {
-    downloadDialog = dialogs.build({
-        title: "下载资源中。。。",
-        progress: {
-            max: 100
-        },
-        canceledOnTouchOutside: false
-    });
-    testDialog = dialogs.build({
-        title: "检查资源中...",
-        progress: {
-            max: -1,
-            horizontal: true
-        },
-        canceledOnTouchOutside: false
-    });
-    downloadId = setInterval(() => {
-        if (unzipProgress >= 1) {
-            clearInterval(downloadId);
-            downloadDialog.dismiss();
-            downloadDialog = null;
-            initRequire();
-            initFloatDialog();
-            initAutoDialog();
-            initData();
-            activity.setSupportActionBar(ui.toolbar);
-            ui.viewpager.setTitles(["推荐项目", "录制脚本"]);
-            ui.tabs.setupWithViewPager(ui.viewpager);
-            ui.toolbar.setupWithDrawer(ui.drawer);
-            ui.server_menu.setDataSource(serverList);
-            ui.gameList.setDataSource(gameList);
-            ui.record_menu.setDataSource(recordList);
-            ui.other_menu.setDataSource(otherList);
-        } else {
-            if (downProgress >= 1) {
-                downloadDialog.setProgress((unzipProgress * 100).toFixed(1));
-            } else {
-                downloadDialog.setProgress((downProgress * 100).toFixed(1));
-            }
-        }
-    }, 20);
-}
 
-/**通过get请求从GitHub下载zip文件*/
-function downGithubZip() {
-    try {
-        testDialog.show()
-        myUrl = new URL(url);
-        conn = myUrl.openConnection();
-        conn.connect();
-        inStream = conn.getInputStream();
-        fs = new FileOutputStream(zipFilePath);
-        // if (game.get("bytesLength", 0) != 184931) {
-        testDialog.dismiss();
-        downloadDialog.show();
-        while ((byteRead = inStream.read(buffer)) != -1) {
-            byteSum += byteRead;
-            fs.write(buffer, 0, byteRead);
-            downProgress = byteSum / 5050368;
-            // console.log("bytesLength" + byteSum);
-        }
-        // game.put("bytesLength", byteSum);
-        inStream.close();
-        fs.close();
-        downloadDialog.setTitle("解压中。。。");
-        unZip(new File(zipFilePath), filePath);
-        // } else {
-        //     testDialog.dismiss();
-        //     toast("已是最新，加载页面中。。。");
-        //     unzipProgress = 1;
-        // }
-
-    } catch (err) {
-        console.error(err);
-    }
-}
-
-/**
- * 将sourceFile解压到targetDir
- * @param sourceFile
- * @param targetDir
- * @throws RuntimeException
- */
-function unZip(sourceFile, targetDir) {
-    // start = System.currentTimeMillis();
-    if (!sourceFile.exists()) {
-        throw new FileNotFound
-        Exception("cannot find the file = " + sourceFile.getPath());
-    }
-    try {
-        zipFile = new ZipFile(sourceFile);
-        // console.log("length"+sourceFile.length());
-        entries = zipFile.entries();
-        byteSum = 0;
-        while (entries.hasMoreElements()) {
-            entry = entries.nextElement();
-            if (entry.isDirectory()) {
-                dirPath = targetDir + "/" + entry.getName();
-                // console.log("创建文件夹" + entry.getName())
-                createDirIfNotExist1(dirPath);
-            } else {
-                // console.log("创建文件" + entry.getName())
-                targetFile = new File(targetDir + "/" + entry.getName());
-                createFileIfNotExist(targetFile);
-                is = null;
-                fos = null;
-                try {
-                    is = zipFile.getInputStream(entry);
-                    fos = new FileOutputStream(targetFile);
-                    while ((byteRead = is.read(buffer)) != -1) {
-                        byteSum += byteRead;
-                        fos.write(buffer, 0, byteRead);
-                        unzipProgress = byteSum/90152;
-                    }
-                } finally {
-                    try {
-                        fos.close();
-                    } catch (error) {
-                        log.warn("close FileOutputStream exception", e);
-                    }
-                    try {
-                        is.close();
-                    } catch (error) {
-                        log.warn("close InputStream exception", e);
-                    }
-                }
-            }
-        }
-        log.info("解压完成");
-    } finally {
-        if (zipFile != null) {
-            try {
-                zipFile.close();
-            } catch (error) {
-                log.warn("close zipFile exception", e);
-            }
-        }
-    }
-}
-
-function createDirIfNotExist1(path) {
-    file = new File(path);
-    createDirIfNotExist2(file);
-}
-
-function createDirIfNotExist2(file) {
-    if (!file.exists()) {
-        file.mkdirs();
-    }
-}
-function createFileIfNotExist(file) {
-    createParentDirIfNotExist(file);
-    file.createNewFile();
-}
-
-function createParentDirIfNotExist(file) {
-    createDirIfNotExist2(file.getParentFile());
-}
+initRequire();
+initFloatDialog();
+initAutoDialog();
+initData();
+activity.setSupportActionBar(ui.toolbar);
+ui.viewpager.setTitles(["推荐项目", "录制脚本"]);
+ui.tabs.setupWithViewPager(ui.viewpager);
+ui.toolbar.setupWithDrawer(ui.drawer);
+ui.server_menu.setDataSource(serverList);
+ui.gameList.setDataSource(gameList);
+ui.record_menu.setDataSource(recordList);
+ui.other_menu.setDataSource(otherList);
 
 //服务选择
 ui.server_menu.on("item_bind", function (itemView, itemHolder) {
@@ -444,6 +272,7 @@ function isBackGame(b_packageName) {
         sleep(3000)
     }
 }
+
 //运行游戏的线程
 function gameThread() {
     runThread = threads.start(function () {
@@ -483,6 +312,7 @@ function gameThread() {
         }
     })
 }
+
 //土豪游戏
 function 土豪游戏() {
     while (suspend) {
@@ -533,6 +363,7 @@ function 土豪游戏() {
         pressRect(rect);
     };
 }
+
 //快手极速版
 function 快手极速版() {
     while (suspend) {
@@ -552,7 +383,7 @@ function 快手极速版() {
             pressRect(findIdButton("live_exit_button"));
         } else {
             pressRect(findTextButton("首页"));
-            var delayTime = random(7000, 10000);
+            var delayTime = random(2000, 6000);
             sleep(delayTime);
         }
     }
@@ -666,7 +497,6 @@ ui.gameList.on("item_bind", function (itemView, itemHolder) {
                 }
             }
         }
-        // console.log(checkGameList);
     })
 })
 //根据id找控件点击
@@ -793,12 +623,12 @@ function runTime(timeout) {
         console.log("运行了" + i + "s");
         if (i >= timeout * 60) {
             if (pattern == 0) {
-                suspend = true;;
+                suspend = true;
+                i = 0;
             } else {
                 suspend = false;
             }
         }
-        i = 0;
     }, 1000);
 }
 

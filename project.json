@@ -1,23 +1,41 @@
 {
-  "main": "main.js",
-  "name": "金多多挂机",
-  "ignore": [
-    "build"
-  ],
-  "packageName": "com.jinduoduo.guaji",
-  "versionCode": 1,
-  "versionName": "1.0.0",
+  "assets": [],
+  "build": {
+    "build_id": "4DF955F2-1",
+    "build_number": 1,
+    "build_time": 1650632414305,
+    "release": false
+  },
   "encryptLevel": 1,
-  "icon": "res/logo.png",
+  "useFeatures": [],
+  "icon": "res/icon.png",
   "launchConfig": {
-    "displaySplash": true,
+    "displaySplash": false,
     "hideLogs": true,
-    "splashIcon": "res/bg.jpg",
+    "splashIcon": "res/splashIcon.png",
     "splashText": "欢迎使用金多多挂机",
     "stableMode": false
   },
+  "main": "main.js",
+  "name": "金多多挂机",
   "optimization": {
+    "removeAccessibilityService": false,
     "removeOpenCv": true,
-    "unusedResources": true
-  }
+    "unusedResources": false
+  },
+  "packageName": "com.jinduoduo.guaji",
+  "permissionConfig": {
+    "requestListOnStartup": [
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.prmission.INSALL_PACKAGES"
+    ]
+  },
+  "scripts": {},
+  "signingConfig": {
+    "alias": "chengxinruan",
+    "keystore": "/storage/emulated/0/脚本/.keystore/autojspro.jks",
+    "uuid": "4066e698-5643-4b9a-90e2-02db4b4ad578"
+  },
+  "versionCode": 1,
+  "versionName": "1.0.0"
 }
