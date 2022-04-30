@@ -1,4 +1,8 @@
 "ui";
+importClass(android.graphics.drawable.GradientDrawable.Orientation);
+importClass(android.graphics.drawable.GradientDrawable);
+importClass(java.net.URL);
+importClass(java.io.FileOutputStream);
 
 var game;
 var fb;
@@ -78,6 +82,14 @@ checkGameList = [];
 
 var img;
 var pattern;
+
+//初始化下载参数
+running = false
+byteSum = 0; //总共读取的文件大小
+byteRead = 0; //每次读取的byte数
+buffer = util.java.array('byte', 1024); //byte[]
+
+var filePath;
 ui.layout(
     <drawer id="drawer">
         <vertical>
@@ -96,6 +108,7 @@ ui.layout(
                                     <text text="运行" />
                                     <input inputType="number" id="inputTime" text="{{this.runTime}}" />
                                     <text text="分钟" />
+                                    <button id="longBottom" text="安装" h="40" w="70" layout_gravity="center" />
                                 </horizontal>
                             </card>
                         </list>
@@ -294,6 +307,7 @@ function gameThread() {
             ui.run(function () {
                 runTime(parseInt(game.get(appName)));
             })
+
             switch (appName) {
                 case "快手极速版":
                     快手极速版();
@@ -366,6 +380,12 @@ function 土豪游戏() {
 
 //快手极速版
 function 快手极速版() {
+    isSee = true;
+    app.launchPackage(packageName2);
+    sleep(5000);
+    pressRect(findCustomizButton("androidx.appcompat.app.ActionBar$c", 12, 3));
+    sleep(5000)
+    slideScreenDown(d_width / 2, d_height / 2, d_width / 2, 0, 100, 1);;
     while (suspend) {
         isBackGame(packageName2);
         if (findTextButton("福利") != null) {
@@ -373,14 +393,27 @@ function 快手极速版() {
             sleep(40000);
             pressRect(findIdButton("video_close_icon"));
             pressRect(findTextButton("已成功领取奖励"));
-        } else if (findTextButton("领福利") != null) {
+            pressRect(findTextButton("放弃奖励"));
+        } else if (findTextButton("再看一个") != null) {
+            pressRect(findTextButton("再看一个"));
+            sleep(40000);
+        } else if (findTextButton("领福利") != null && isSee) {
             pressRect(findTextButton("领福利"));
-            sleep(75000);
-            pressRect(findIdButton("live_close_place_holder"));
             sleep(1000);
-            pressRect(findIdButton("exit_btn"));
-            sleep(1000);
-            pressRect(findIdButton("live_exit_button"));
+            if (findTextButton("10/10") != null) {
+                isSee = false;
+                console.log("已经领取完");
+            } else {
+                click(d_width / 2, d_height / 2);
+                sleep(65000);
+                pressRect(findIdButton("live_close_place_holder"));
+                sleep(1000);
+                pressRect(findTextButton("退出"));
+                sleep(1000);
+                pressRect(findTextButton("退出直播间"));
+                sleep(1000);
+            }
+            pressRect(findIdButton("left_btn"));
         } else {
             pressRect(findTextButton("首页"));
             var delayTime = random(2000, 6000);
@@ -470,6 +503,7 @@ function installApp(appName) {
 //勾选的游戏的监听
 ui.gameList.on("item_bind", function (itemView, itemHolder) {
     listView.push(itemView);
+    // setDrawable(itemView.longBottom);
     itemView.game1.on("check", (checked) => {
         var position = itemHolder.position;
         if (checked) {
@@ -498,6 +532,68 @@ ui.gameList.on("item_bind", function (itemView, itemHolder) {
             }
         }
     })
+
+    itemView.longBottom.on("click", () => {
+        var position = itemHolder.position;
+        if (gameList[position].isClickable) {
+            toast("已经安装")
+        } else {
+            if (running) {
+                toast("已经在安装中")
+                return
+            }
+            // if (files.exists(filePath)) {
+            //     ui.longBottom.text("下载完成")
+            //     gradientDrawable.setColors(colorArr, [1, 0]);
+            //     ui.longBottom.setBackground(gradientDrawable);
+            //     app.viewFile(filePath)
+            //     return
+            // }
+            // toast("注意你的流量哦")
+            progress = 0
+            running = true
+            //开始下载
+            let setProgress = setInterval(() => {
+                itemView.longBottom.text((progress * 100).toFixed(1) + "%")
+                if (progress >= 1) {
+                    running = false
+                    clearInterval(setProgress)
+                    toast("下载完成");
+
+                    //读入文件
+                    var newApkFile = new File(filePath);
+                    var intent = new Intent(Intent.ACTION_VIEW);
+                    intent.addCategory(Intent.CATEGORY_DEFAULT);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    var type = "application/vnd.android.package-archive";
+                    var uri;
+                    if (device.sdkInt > 23) {
+                        //创建url
+                        uri = Packages["androidx"].core.content.FileProvider.getUriForFile(context, app.fileProviderAuthority, newApkFile);
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } else {
+                        uri = Uri.fromFile(newApkFile);
+                    }
+                    intent.setDataAndType(uri, type);
+                    app.startActivity(intent);
+                }
+            }, 20)
+
+            threads.start(function () {
+                filePath = files.path("./" + gameList[position].appName + ".apk");
+                var myUrl = new URL(gameList[position].url);
+                var conn = myUrl.openConnection(); //URLConnection
+                inStream = conn.getInputStream(); //InputStream
+                fs = new FileOutputStream(filePath); //FileOutputStream
+                connLength = conn.getContentLength(); //int
+                while ((byteRead = inStream.read(buffer)) != -1) {
+                    byteSum += byteRead;
+                    fs.write(buffer, 0, byteRead); //读取
+                    progress = byteSum / connLength;
+                }
+            })
+        }
+    })
 })
 //根据id找控件点击
 function findIdButton(b_id) {
@@ -522,7 +618,6 @@ function findTextButton(b_text) {
 function findTextContains(str, i) {
     rect = textContains(str).findOnce(i);
     if (rect != null) {
-        ;
         console.log("找到匹配控件");
         return rect;
     }
@@ -530,8 +625,8 @@ function findTextContains(str, i) {
 }
 
 //根据属性className、classNane、drawOrder找控件点击
-function findCustomizButton(b_text, b_depth, b_drawingOrder) {
-    rect = text(b_text).depth(b_depth).drawingOrder(b_drawingOrder).findOnce();
+function findCustomizButton(b_className, b_depth, b_drawingOrder) {
+    rect = className(b_className).depth(b_depth).drawingOrder(b_drawingOrder).findOnce();
     if (rect != null) {
         console.log("找到控件坐标" + "(" + rect.bounds().centerX() + "," + rect.bounds().centerY() + ")");
         return rect;
@@ -620,7 +715,7 @@ function runTime(timeout) {
     var i = 0;
     var id = setInterval(function () {
         i++;
-        console.log("运行了" + i + "s");
+        // console.log("运行了" + i + "s");
         if (i >= timeout * 60) {
             if (pattern == 0) {
                 suspend = true;
@@ -698,11 +793,11 @@ function initData() {
             if (getAppName(element.packageName) == null) {
                 color = "#C0C0C0";
                 isClickable = false;
-                noDownGameList.push(new Game(element.appName, element.packageName, color, false, game.get(element.appName, "30")));
+                noDownGameList.push(new Game(element.appName, element.packageName, color, false, game.get(element.appName, "30"),element.url));
             } else {
                 color = "#FFFFFF";
                 isClickable = true;
-                downGameList.push(new Game(element.appName, element.packageName, color, true, game.get(element.appName, "30")));
+                downGameList.push(new Game(element.appName, element.packageName, color, true, game.get(element.appName, "30"),element.url));
             }
         }
         for (var i = 0; i < downGameList.length; i++) {
@@ -731,6 +826,16 @@ function initRequire() {
     require("/sdcard/脚本/jinduoduo-main/FloatButton/FloatButton.js");
     Bmob = require("/sdcard/脚本/jinduoduo-main/bmob.js");
     Game = require("/sdcard/脚本/jinduoduo-main/game.js");
+}
+
+//
+function setDrawable(view) {
+    let gradientDrawable = new GradientDrawable()
+    let colorArr = [colors.GREEN, colors.TRANSPARENT]
+    gradientDrawable.setCornerRadius(50);
+    gradientDrawable.setStroke(3, colors.parseColor("#000000"));
+    gradientDrawable.setOrientation(GradientDrawable$Orientation.LEFT_RIGHT);
+    view.setBackground(gradientDrawable);
 }
 
 //按音量键下停止脚本运行

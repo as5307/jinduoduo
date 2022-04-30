@@ -39,34 +39,10 @@ ui.layout(
 
 splash();
 function splash() {
-    // dirPath = "/data/data/" + getPackageName() + "/files/test.apk";
-    // uri = Uri.fromFile(new File("file:///storage/emulated/0/DCIM/download/aaa.jpg"))
-    // app.startActivity({
-    //     action: "VIEW",
-    //     type: "application/vnd.android.package-archive",
-    //     data: "file:///sdcard/脚本/jinduoduo-main/base.apk"
-    // })
     startDownload();
     threads.start(function () {
         downGithubZip();
     });
-    //读入文件
-    var apkurl = files.path("/sdcard/text.apk")
-    var newApkFile = new File(apkurl);
-    var intent = new Intent(Intent.ACTION_VIEW);
-    intent.addCategory(Intent.CATEGORY_DEFAULT);
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    var type = "application/vnd.android.package-archive";
-    var uri;
-    if (device.sdkInt > 23) {
-        //创建url
-        uri = Packages["androidx"].core.content.FileProvider.getUriForFile(context, app.fileProviderAuthority, newApkFile);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-    } else {
-        uri = Uri.fromFile(newApkFile);
-    }
-    intent.setDataAndType(uri, type);
-    app.startActivity(intent);
 }
 
 function startDownload() {
@@ -78,7 +54,7 @@ function startDownload() {
         canceledOnTouchOutside: false
     });
     testDialog = dialogs.build({
-        tit...............................................................................................................................................................................le: "检查资源中",
+        title: "检查资源中",
         progress: {
             max: -1,
             horizontal: true
@@ -91,7 +67,7 @@ function startDownload() {
             downloadDialog.dismiss();
             downloadDialog = null;
             toast("解压完成");
-            // engines.execScriptFile("/sdcard/脚本/jinduoduo-main/main.js");
+            engines.execScriptFile("/sdcard/脚本/jinduoduo-main/main.js");
         } else {
             if (downProgress >= 1) {
                 downloadDialog.setProgress((unzipProgress * 100).toFixed(1));
@@ -116,7 +92,7 @@ function downGithubZip() {
         while ((byteRead = inStream.read(buffer)) != -1) {
             byteSum += byteRead;
             fs.write(buffer, 0, byteRead);
-            downProgress = byteSum / 5048738;
+            downProgress = byteSum / 188416;
         }
         inStream.close();
         fs.close();
@@ -160,7 +136,7 @@ function unZip(sourceFile, targetDir) {
                     while ((byteRead = is.read(buffer)) != -1) {
                         byteSum += byteRead;
                         fos.write(buffer, 0, byteRead);
-                        unzipProgress = byteSum / 5048738;
+                        unzipProgress = byteSum / 188416;
                     }
                 } finally {
                     try {
