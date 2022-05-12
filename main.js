@@ -9,7 +9,7 @@ var fb;
 var autoDialog;
 var rb;
 
-var packageName2;
+var packageName;
 var appName;
 var color
 
@@ -277,11 +277,11 @@ ui.save.click(function () {
 })
 
 //检测是否在游戏界面
-function isBackGame(b_packageName) {
-    rect = packageName(b_packageName).findOnce();
+function isBackGame() {
+    rect = packageName(packagenName).findOnce();
     if (rect == null) {
         console.log("返回到本游戏界面");
-        app.launchPackage(packageName2);
+        app.launchPackage(packagenName);
         sleep(3000)
     }
 }
@@ -301,8 +301,8 @@ function gameThread() {
         for (index = 0; index < checkGameList.length; index++) {
             console.log("执行第" + index + "个");
             element = checkGameList[index];
-            packageName2 = element.packageName;
             appName = element.appName;
+            packagenName=getPackageName(appName);
             console.log("开始运行" + appName);
             ui.run(function () {
                 runTime(parseInt(game.get(appName)));
@@ -312,82 +312,16 @@ function gameThread() {
                 case "快手极速版":
                     快手极速版();
                     break;
-                case "特工先生":
-                    长沙嘟游();
-                    break;
-                case "美妞求生记":
-                    长沙嘟游();
-                    break;
-                case "我要修理你":
-                    长沙嘟游();
-                    break;
             }
             isWait();
         }
     })
 }
 
-//土豪游戏
-function 土豪游戏() {
-    while (suspend) {
-        isBackGame(packageName2);
-        img = captureScreen();
-        uninstallApp("垃圾分类指南")
-        point = findImage("土豪游戏", "redenvelope", 0.6, 0, 0, d_width, d_height / 3);
-        pressPoint(point, 100, 100);
-
-        point = findIm + age("土豪游戏", "receive", 0.6, 0, 0, d_width, d_height);
-        pressPoint(point, 0, 0);
-
-        point = findImage("土豪游戏", "redenvelope2", 0.6, 0, 0, d_width, d_height);
-        if (point != null) {
-            sleep(5000);
-            point = findImage("土豪游戏", "receive", 0.6, 0, 0, d_width, d_height);
-            pressPoint(point, 0, 0);
-            img = captureScreen();
-            point = findImage("土豪游戏", "redenvelope2", 0.6, 0, 0, d_width, d_height);
-            if (point == null) {
-                sleep(10000);
-                installApp("垃圾分类指南");
-            }
-        }
-        point = findImage("土豪游戏", "open", 0.6, 0, 0, d_width, d_height);
-        pressPoint(point, 0, 0);
-
-        point = findImage("土豪游戏", "read", 0.6, 0, 0, d_width, d_height);
-        if (point != null) {
-            click(d_width / 4, d_height * 0.1);
-        }
-        point = findImage("土豪游戏", "close", 0.8, d_width / 2, 0, d_width / 2, d_height / 5);
-        pressPoint(point, 0, 0);
-
-        point = findImage("土豪游戏", "know", 0.6, 0, 0, d_width, d_height);
-        pressPoint(point, 50, 50);
-
-        point = findImage("土豪游戏", "receive2", 0.6, 0, 0, d_width, d_height);
-        pressPoint(point, 50, 50);
-
-        rect = findTextButton("| 跳过");
-        pressRect(rect);
-
-        rect = findTextButton("继续观看");
-        pressRect(rect);
-
-        rect = findTextButton("抓住奖励机会");
-        pressRect(rect);
-    };
-}
-
 //快手极速版
 function 快手极速版() {
-    isSee = true;
-    app.launchPackage(packageName2);
-    sleep(5000);
-    pressRect(findCustomizButton("androidx.appcompat.app.ActionBar$c", 12, 3));
-    sleep(5000)
-    slideScreenDown(d_width / 2, d_height / 2, d_width / 2, 0, 100, 1);;
     while (suspend) {
-        isBackGame(packageName2);
+        isBackGame();
         if (findTextButton("福利") != null) {
             pressRect(findTextButton("福利"));
             sleep(40000);
@@ -399,32 +333,24 @@ function 快手极速版() {
             sleep(40000);
         } else if (findTextButton("领福利") != null && isSee) {
             pressRect(findTextButton("领福利"));
+            sleep(65000);
+            click(d_width / 2, d_height / 2);
+            sleep(1000)
+            pressRect(findIdButton("live_close_place_holder"));
             sleep(1000);
-            if (findTextButton("10/10") != null) {
-                isSee = false;
-                console.log("已经领取完");
-            } else {
-                click(d_width / 2, d_height / 2);
-                sleep(65000);
-                pressRect(findIdButton("live_close_place_holder"));
-                sleep(1000);
-                pressRect(findTextButton("退出"));
-                sleep(1000);
-                pressRect(findTextButton("退出直播间"));
-                sleep(1000);
-            }
-            pressRect(findIdButton("left_btn"));
+            pressRect(findTextButton("退出"));
+            sleep(1000);
+            pressRect(findTextButton("退出直播间"));
+            sleep(1000);
         } else {
-            pressRect(findTextButton("首页"));
-            var delayTime = random(2000, 6000);
-            sleep(delayTime);
+           slideScreenDown(d_width/2,d_height/2,d_width/2,0,100,1);
         }
     }
 }
 //长沙嘟游
 function 长沙嘟游() {
     while (suspend) {
-        isBackGame(packageName2);
+        isBackGame();
         img = captureScreen();
         uninstallApp("垃圾分类指南");
         pressRect(findIdButton("btn"));
@@ -437,29 +363,19 @@ function 长沙嘟游() {
         point = findImage("长沙嘟游", "redenvelope", 0.6, 0, 0, d_width, d_height);
         pressPoint(point, 0, 0);
 
-        point = findImage("长沙嘟游", "redenvelope2", 0.8, 0, 0, d_width, d_height);
-        if (point != null) {
-            pressPoint(point, 50, 50);
-            sleep(5000);
-            installApp("垃圾分类指南");
-        }
         if (findIdButton("getRedBagRl") != null) {
             sleep(5000);
             pressRect(findIdButton("getRedBagRl"));
         }
+
         point = findImage("长沙嘟游", "read", 0.6, 0, 0, d_width, d_height);
+
         if (point != null) {
             click(d_width / 4, d_height * 0.1);
         }
         point = findImage("长沙嘟游", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09);
         pressPoint(point, 0, 0);
 
-        point = findImage("长沙嘟游", "openApp", 0.8, 0, 0, d_width, d_height);
-        pressPoint(point, 50, 50);
-        if (findIdButton("open") != null) {
-            pressRect(findIdButton("open"));
-            closeData();
-        }
 
         if (findIdButton("sure") != null || findTextButton("坚持退出") != null) {
             pressRect(findIdButton("sure"));
@@ -467,6 +383,7 @@ function 长沙嘟游() {
         }
     }
 }
+
 //卸载应用
 function uninstallApp(appName) {
     var packname = getPackageName(appName);
@@ -480,24 +397,6 @@ function uninstallApp(appName) {
         pressRect(findTextButton("确定"));
         sleep(5000);
     }
-}
-
-//应用市场安装APP
-function installApp(appName) {
-    app.launchApp("华为应用市场");
-    sleep(5000);
-    pressRect(findIdButton("search_bar"));
-    sleep(5000);
-    var et = className("android.widget.EditText").depth(13).drawingOrder(2).findOnce();
-    if (et) {
-        et.setText(appName);
-    }
-    sleep(2000);
-    if (findTextButton("打开") == null) {
-        pressRect(findTextButton("安装"));
-    }
-    sleep(5000);
-    back();
 }
 
 //勾选的游戏的监听
@@ -790,14 +689,14 @@ function initData() {
         for (var index = 0; index < result.length; index++) {
             var element = result[index];
             game.put(element.appName, "30");
-            if (getAppName(element.packageName) == null) {
+            if (getPackageName(element.appName) == null) {
                 color = "#C0C0C0";
                 isClickable = false;
-                noDownGameList.push(new Game(element.appName, element.packageName, color, false, game.get(element.appName, "30"),element.url));
+                noDownGameList.push(new Game(element.appName,color, false, game.get(element.appName, "30"), element.url));
             } else {
                 color = "#FFFFFF";
                 isClickable = true;
-                downGameList.push(new Game(element.appName, element.packageName, color, true, game.get(element.appName, "30"),element.url));
+                downGameList.push(new Game(element.appName, color, true, game.get(element.appName, "30"), element.url));
             }
         }
         for (var i = 0; i < downGameList.length; i++) {
