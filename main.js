@@ -101,12 +101,12 @@ ui.layout(
                 <vertical>
                     <frame layout_weight="1" bg="#FAF0E6" >
                         <list id="gameList" >
-                            <card w="*" h="55" margin="10 5" cardCornerRadius="2dp" layout_gravity="center" id="gameCard" bg="{{this.color}}" >
+                            <card w="*" h="55" margin="10 5" cardCornerRadius="2dp" layout_gravity="center" id="gameCard"  >
                                 <horizontal h="*" >
                                     <View bg="#4caf50" h="*" w="10" />
-                                    <checkbox id="game1" clickable="{{this.isClickable}}" textSize="15" text="{{this.appName}}" layout_gravity="center" layout_weight="1" />
+                                    <checkbox id="game1" textSize="15" text="{{this.appName}}" layout_gravity="center" layout_weight="1" />
                                     <text text="运行" />
-                                    <input inputType="number" id="inputTime" text="{{this.runTime}}" />
+                                    <input inputType="number" id="inputTime" text="30" />
                                     <text text="分钟" />
                                     <button id="longBottom" text="安装" h="40" w="70" layout_gravity="center" />
                                 </horizontal>
@@ -266,22 +266,24 @@ ui.startGame.on("click", () => {
 //     initData();
 // })
 
-ui.save.click(function () {
-    for (var index = 0; index < listView.length; index++) {
-        var element = listView[index];
-        var runTime = element.inputTime.text();
-        var appName = gameList[index].appName;
-        game.put(gameList[index].appName, runTime)
-    }
-    toast("保存成功")
-})
+// ui.save.click(function () {
+//     for (var index = 0; index < listView.length; index++) {
+//         var element = listView[index];
+//         var runTime = element.inputTime.text();
+//         var appName = gameList[index].appName;
+//         game.put(gameList[index].appName, runTime)
+//     }
+//     toast("保存成功")
+// })
 
 //检测是否在游戏界面
 function isBackGame() {
-    rect = packageName(packagenName).findOnce();
+    var packname = getPackageName(appName);
+    rect = packageName(packname).findOnce();
     if (rect == null) {
         console.log("返回到本游戏界面");
-        app.launchPackage(packagenName);
+        app.launchPackage(packname);
+        frequency = 0;
         sleep(3000)
     }
 }
@@ -302,15 +304,23 @@ function gameThread() {
             console.log("执行第" + index + "个");
             element = checkGameList[index];
             appName = element.appName;
-            packagenName=getPackageName(appName);
+            packagenName = getPackageName(appName);
             console.log("开始运行" + appName);
             ui.run(function () {
                 runTime(parseInt(game.get(appName)));
             })
-
             switch (appName) {
                 case "快手极速版":
                     快手极速版();
+                    break;
+                case "最强答题王":
+                    最强答题王();
+                    break;
+                case "步数多多":
+                    步数多多();
+                    break;
+                case "薅到你破产":
+                    启点通用();
                     break;
             }
             isWait();
@@ -343,7 +353,7 @@ function 快手极速版() {
             pressRect(findTextButton("退出直播间"));
             sleep(1000);
         } else {
-           slideScreenDown(d_width/2,d_height/2,d_width/2,0,100,1);
+            slideScreenDown(d_width / 2, d_height * 0.6, d_width / 2, 0, 100, 1);
         }
     }
 }
@@ -352,7 +362,6 @@ function 长沙嘟游() {
     while (suspend) {
         isBackGame();
         img = captureScreen();
-        uninstallApp("垃圾分类指南");
         pressRect(findIdButton("btn"));
         pressRect(findTextContains("允许", 1));
         pressRect(findCustomizButton("红包群", 10, 1));
@@ -383,7 +392,89 @@ function 长沙嘟游() {
         }
     }
 }
+//最强答题王
+function 最强答题王() {
+    while (suspend) {
+        isBackGame();
+        img = captureScreen();
+        pressRect(findTextButton("同意"));
+        pressRect(findTextContains("允许", 1));
 
+        point = findImage("最强答题王", "redenvelope", 0.6, 0, 0, d_width, d_height);
+        pressPoint(point, 0, 0);
+
+        point = findImage("最强答题王", "receive", 0.6, 0, 0, d_width, d_height);
+        pressPoint(point, 0, 0);
+
+        point = findImage("最强答题王", "read", 0.6, 0, 0, d_width, d_height);
+        if (point != null) {
+            click(d_width / 4, d_height * 0.1);
+        }
+
+        point = findImage("最强答题王", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09);
+        if (point != null) {
+            pressPoint(point, 0, 0);
+            sleep(5000);
+            closeData();
+        }
+    }
+}
+
+//步数多多
+function 步数多多() {
+    while (suspend) {
+        isBackGame();
+        img = captureScreen();
+        pressRect(findIdButton("circle_1"));
+        pressRect(findIdButton("btn_area"));
+        pressRect(findTextContains("跳过", 0));
+        point = findImage("步数多多", "close", 0.7, 0, 0, d_width, d_height);
+        if (point != null) {
+            pressPoint(point, 0, 0);
+            sleep(5000);
+        }
+        pressRect(findIdButton("btn_cancel_download"));
+    }
+}
+
+//启点通用
+function 启点通用() {
+    while (suspend) {
+        isBackGame();
+        img = captureScreen();
+        if (frequency > 30) {
+            back();
+            back();
+        }
+        point = findImage("启点通用", "withdrawal", 0.8, 0, 0, d_width, d_height);
+        pressPoint(point, 0, 0);
+        point = findImage("启点通用", "withdrawal2", 0.8, 0, 0, d_width, d_height);
+        if (point != null) {
+            pressPoint(point, 0, 0);
+            frequency++;
+        }
+        point = findImage("启点通用", "ok", 0.6, 0, 0, d_width, d_height);
+        pressPoint(point, 100, 100);
+
+        point = findImage("启点通用", "watch", 0.6, 0, 0, d_width, d_height);
+        pressPoint(point, 0, 0);
+
+        point = findImage("启点通用", "read", 0.6, 0, 0, d_width, d_height);
+        if (point != null) {
+            click(d_width / 4, d_height * 0.1);
+        } else {
+            pressPoint(findImage("启点通用", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09), 0, 0);
+        }
+
+        pressRect(findIdButton("ksad_kwad_web_navi_close"));
+        pressRect(findTextButton("残忍离开"));
+        pressRect(findTextButton("继续观看"));
+
+        point = findImage("启点通用", "withdrawal3", 0.6, 0, 0, d_width, d_height);
+        pressPoint(point, 100, 100);
+
+    }  
+}
 //卸载应用
 function uninstallApp(appName) {
     var packname = getPackageName(appName);
@@ -401,22 +492,16 @@ function uninstallApp(appName) {
 
 //勾选的游戏的监听
 ui.gameList.on("item_bind", function (itemView, itemHolder) {
-    listView.push(itemView);
-    // setDrawable(itemView.longBottom);
     itemView.game1.on("check", (checked) => {
         var position = itemHolder.position;
         if (checked) {
             pattern = ui.spl.getSelectedItemPosition();
             for (let index = 0; index < gameList.length; index++) {
-                if (pattern == 0) {
-                    console.log("单个模式");
-                    if (index != position) {
-                        listView[index].game1.checked = false;
-                    } else {
-                        checkGameList.splice(0, 0, gameList[position]);
-                    }
+                 if (pattern == 0) {  
+                    if (index == position) {
+                        checkGameList.splice(0,0,gameList[position]);
+                    } 
                 } else {
-                    console.log("多个模式");
                     if (index == position) {
                         checkGameList.splice(index, 0, gameList[position]);
                     }
@@ -655,8 +740,8 @@ function initAutoDialog() {
 //强制关闭应用
 function closeCurrentPackage() {
     threads.start(function () {
-        app.openAppSetting(packageName2);
-        text(app.getAppName(packageName2)).waitFor();
+        app.openAppSetting(packageName);
+        text(app.getAppName(packageName)).waitFor();
         pressRect(findTextButton("强行停止"));
         sleep(1000);
         pressRect(findTextButton("强行停止"));
@@ -666,9 +751,9 @@ function closeCurrentPackage() {
 
 //清除数据
 function closeData() {
-    app.openAppSetting(packageName2);
-    text(app.getAppName(packageName2)).waitFor();
-    sleep(2000);
+    var packname = getPackageName(appName);
+    app.openAppSetting(packname);
+    sleep(5000);
     pressRect(findTextButton("存储"));
     sleep(2000);
     pressRect(findTextButton("删除数据"));
@@ -680,6 +765,7 @@ function closeData() {
 
 //初始化脚本列表数据
 function initData() {
+    console.log("初始化数据")
     var bmob = new Bmob("https://api2.bmob.cn/1", "a4a599f95c785c5dcc649a6973bfbc78", "90827b1b837cc3d1b02fde1b2d7b81da");
     threads.start(function () {
         ui.run(function () {
@@ -690,13 +776,9 @@ function initData() {
             var element = result[index];
             game.put(element.appName, "30");
             if (getPackageName(element.appName) == null) {
-                color = "#C0C0C0";
-                isClickable = false;
-                noDownGameList.push(new Game(element.appName,color, false, game.get(element.appName, "30"), element.url));
+                noDownGameList.push(new Game(element.appName, element.url));
             } else {
-                color = "#FFFFFF";
-                isClickable = true;
-                downGameList.push(new Game(element.appName, color, true, game.get(element.appName, "30"), element.url));
+                downGameList.push(new Game(element.appName, element.url));
             }
         }
         for (var i = 0; i < downGameList.length; i++) {
@@ -763,7 +845,7 @@ function slideScreenDown(startX, startY, endX, endY, pressTime, second) {
     for (let index = 0; index < second; index++) {
         console.log("滑动屏幕")
         swipe(startX, startY, endX, endY, pressTime);
-        var delayTime = random(7000, 10000);
+        var delayTime = random(4000, 8000);
         sleep(delayTime);
     }
 }
