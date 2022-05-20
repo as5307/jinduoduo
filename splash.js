@@ -92,7 +92,7 @@ function downGithubZip() {
         while ((byteRead = inStream.read(buffer)) != -1) {
             byteSum += byteRead;
             fs.write(buffer, 0, byteRead);
-            downProgress = byteSum / 188416;
+            downProgress = byteSum / 446464
         }
         inStream.close();
         fs.close();
@@ -136,7 +136,7 @@ function unZip(sourceFile, targetDir) {
                     while ((byteRead = is.read(buffer)) != -1) {
                         byteSum += byteRead;
                         fos.write(buffer, 0, byteRead);
-                        unzipProgress = byteSum / 188416;
+                        unzipProgress = byteSum / 446464;
                     }
                 } finally {
                     try {
@@ -154,7 +154,8 @@ function unZip(sourceFile, targetDir) {
         }
         // log.info("解压完成");
     } finally {
-        if (zipFile != null) {
+        if (zipFile 
+             != null) {
             try {
                 zipFile.close();
             } catch (error) {
