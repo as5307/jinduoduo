@@ -377,12 +377,12 @@ function 长沙嘟游() {
             pressRect(findIdButton("getRedBagRl"));
         }
 
-        point = findImage("长沙嘟游", "read", 0.6, 0, 0, d_width, d_height);
+        point = findImage("关闭广告", "read", 0.6, 0, 0, d_width, d_height);
 
         if (point != null) {
             click(d_width / 4, d_height * 0.1);
         }
-        point = findImage("长沙嘟游", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09);
+        point = findImage("关闭广告", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09);
         pressPoint(point, 0, 0);
 
 
@@ -397,26 +397,22 @@ function 最强答题王() {
     while (suspend) {
         isBackGame();
         img = captureScreen();
-        pressRect(findTextButton("同意"));
-        pressRect(findTextContains("允许", 1));
+
+        pressRect(findTextContains("跳过", 0));
 
         point = findImage("最强答题王", "redenvelope", 0.6, 0, 0, d_width, d_height);
-        pressPoint(point, 0, 0);
+        pressPoint(point, 50, 50);
 
-        point = findImage("最强答题王", "receive", 0.6, 0, 0, d_width, d_height);
-        pressPoint(point, 0, 0);
-
-        point = findImage("最强答题王", "read", 0.6, 0, 0, d_width, d_height);
+        point = findImage("关闭广告", "read", 0.6, 0, 0, d_width, d_height);
         if (point != null) {
             click(d_width / 4, d_height * 0.1);
         }
 
-        point = findImage("最强答题王", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09);
-        if (point != null) {
-            pressPoint(point, 0, 0);
-            sleep(5000);
-            closeData();
-        }
+        point = findImage("关闭广告", "close", 0.6, 0, 0, d_width , d_height);
+        pressPoint(point, 0, 0);
+
+        pressRect(findIdButton("ksad_kwad_web_navi_close"));
+        pressRect(findTextButton("残忍离开"));
     }
 }
 
@@ -428,7 +424,7 @@ function 步数多多() {
         pressRect(findIdButton("circle_1"));
         pressRect(findIdButton("btn_area"));
         pressRect(findTextContains("跳过", 0));
-        point = findImage("步数多多", "close", 0.7, 0, 0, d_width, d_height);
+        point = findImage("关闭广告", "close", 0.7, 0, 0, d_width, d_height);
         if (point != null) {
             pressPoint(point, 0, 0);
             sleep(5000);
@@ -446,31 +442,32 @@ function 启点通用() {
             back();
             back();
         }
-        point = findImage("启点通用", "withdrawal", 0.8, 0, 0, d_width, d_height);
+        point = findImage("启点通用", "withdrawal", 0.7, 0, 0, d_width, d_height);
         pressPoint(point, 0, 0);
-        point = findImage("启点通用", "withdrawal2", 0.8, 0, 0, d_width, d_height);
+        point = findImage("启点通用", "withdrawal2", 0.7
+        , 0, 0, d_width, d_height);
         if (point != null) {
             pressPoint(point, 0, 0);
             frequency++;
         }
-        point = findImage("启点通用", "ok", 0.6, 0, 0, d_width, d_height);
+        point = findImage("启点通用", "ok", 0.7, 0, 0, d_width, d_height);
         pressPoint(point, 100, 100);
 
-        point = findImage("启点通用", "watch", 0.6, 0, 0, d_width, d_height);
+        point = findImage("启点通用", "watch", 0.7, 0, 0, d_width, d_height);
         pressPoint(point, 0, 0);
 
-        point = findImage("启点通用", "read", 0.6, 0, 0, d_width, d_height);
+        point = findImage("关闭广告", "read", 0.7, 0, 0, d_width, d_height);
         if (point != null) {
             click(d_width / 4, d_height * 0.1);
         } else {
-            pressPoint(findImage("启点通用", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09), 0, 0);
+            pressPoint(findImage("关闭广告", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09), 0, 0);
         }
 
         pressRect(findIdButton("ksad_kwad_web_navi_close"));
         pressRect(findTextButton("残忍离开"));
         pressRect(findTextButton("继续观看"));
 
-        point = findImage("启点通用", "withdrawal3", 0.6, 0, 0, d_width, d_height);
+        point = findImage("启点通用", "withdrawal3", 0.7, 0, 0, d_width, d_height);
         pressPoint(point, 100, 100);
 
     }  
