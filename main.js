@@ -322,6 +322,12 @@ function gameThread() {
                 case "薅到你破产":
                     启点通用();
                     break;
+                case "盲猜成语":
+                    启点通用();
+                    break;
+                case "消除高手":
+                    启点通用();
+                    break;
             }
             isWait();
         }
@@ -408,7 +414,7 @@ function 最强答题王() {
             click(d_width / 4, d_height * 0.1);
         }
 
-        point = findImage("关闭广告", "close", 0.6, 0, 0, d_width , d_height);
+        point = findImage("关闭广告", "close", 0.6, 0, 0, d_width, d_height);
         pressPoint(point, 0, 0);
 
         pressRect(findIdButton("ksad_kwad_web_navi_close"));
@@ -438,18 +444,18 @@ function 启点通用() {
     while (suspend) {
         isBackGame();
         img = captureScreen();
-        if (frequency > 30) {
-            back();
-            back();
-        }
+        // if (frequency > 30) {
+        //     back();
+        //     back();
+        // }
         point = findImage("启点通用", "withdrawal", 0.7, 0, 0, d_width, d_height);
-        pressPoint(point, 0, 0);
-        point = findImage("启点通用", "withdrawal2", 0.7
-        , 0, 0, d_width, d_height);
+        pressPoint(point, 50, 50);
+        point = findImage("启点通用", "withdrawal2", 0.7, 0, 0, d_width, d_height);
         if (point != null) {
             pressPoint(point, 0, 0);
             frequency++;
-        }
+        } 
+
         point = findImage("启点通用", "ok", 0.7, 0, 0, d_width, d_height);
         pressPoint(point, 100, 100);
 
@@ -460,17 +466,18 @@ function 启点通用() {
         if (point != null) {
             click(d_width / 4, d_height * 0.1);
         } else {
-            pressPoint(findImage("关闭广告", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09), 0, 0);
+            pressPoint(findImage("关闭广告", "close", 0.6, 0, 0, d_width, d_height), 0, 0);
         }
-
+        
         pressRect(findIdButton("ksad_kwad_web_navi_close"));
         pressRect(findTextButton("残忍离开"));
-        pressRect(findTextButton("继续观看"));
+        pressRect(findTextButton("坚持退出"));
 
         point = findImage("启点通用", "withdrawal3", 0.7, 0, 0, d_width, d_height);
-        pressPoint(point, 100, 100);
-
-    }  
+        if (point != null) {
+            pressPoint(point, 100, 100);
+        }
+    }
 }
 //卸载应用
 function uninstallApp(appName) {
@@ -494,10 +501,10 @@ ui.gameList.on("item_bind", function (itemView, itemHolder) {
         if (checked) {
             pattern = ui.spl.getSelectedItemPosition();
             for (let index = 0; index < gameList.length; index++) {
-                 if (pattern == 0) {  
+                if (pattern == 0) {
                     if (index == position) {
-                        checkGameList.splice(0,0,gameList[position]);
-                    } 
+                        checkGameList.splice(0, 0, gameList[position]);
+                    }
                 } else {
                     if (index == position) {
                         checkGameList.splice(index, 0, gameList[position]);
