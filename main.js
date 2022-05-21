@@ -328,6 +328,13 @@ function gameThread() {
                 case "消除高手":
                     启点通用();
                     break;
+                case "拜托别消我":
+                    启点通用();
+                    break;
+                case "逆袭之王":
+                    启点通用();
+                    break;
+    
             }
             isWait();
         }
@@ -444,41 +451,51 @@ function 启点通用() {
     while (suspend) {
         isBackGame();
         img = captureScreen();
-        if (frequency > 30) {
-            back(); 
-            back();
-        }
+        // if (frequency > 3) {
+        //     back();
+        //     back();
+        // }
+        point = findImage("启点通用", "start", 0.6, 0, 0, d_width, d_height);
+        pressPoint(point, 100, 100);
+
         point = findImage("启点通用", "withdrawal", 0.7, 0, 0, d_width, d_height);
         pressPoint(point, 50, 50);
-        point = findImage("启点通用", "withdrawal2", 0.7, 0, 0, d_width, d_height);
+
+        point = findImage("启点通用", "withdrawal2", 0.7, 0, 0, d_width, d_height/2);
         if (point != null) {
             pressPoint(point, 0, 0);
-            frequency++;
+            // frequency++;
         }
 
         point = findImage("启点通用", "ok", 0.6, 0, 0, d_width, d_height);
         pressPoint(point, 100, 100);
 
         point = findImage("启点通用", "watch", 0.6, 0, 0, d_width, d_height);
-        pressPoint(point, 0, 0);
+        pressPoint(point, 0, 0); 
 
         point = findImage("关闭广告", "read", 0.6, 0, 0, d_width, d_height);
         if (point != null) {
             click(d_width / 4, d_height * 0.1);
         } else {
-            point = findImage("关闭广告", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09);
+            point = findImage("关闭广告", "close", 0.6, d_width * 0.7, 0, d_width * 0.3, d_height /2);
             pressPoint(point, 0, 0);
         }
-
-        
-        pressRect(findIdButton("ksad_kwad_web_navi_close"));
-        pressRect(findTextButton("残忍离开"));
-        pressRect(findTextButton("坚持退出"));
-
         point = findImage("启点通用", "withdrawal3", 0.6, 0, 0, d_width, d_height);
         if (point != null) {
             pressPoint(point, 100, 100);
+            sleep(5000);
         }
+
+        if (findTextButton("应用详情")!=null) {
+            back();
+        }
+
+        pressRect(findIdButton("ksad_kwad_web_navi_close"));
+        pressRect(findTextButton("残忍离开"));
+        pressRect(findTextButton("坚持退出"));
+        pressRect(findTextContains("跳过", 0));
+     
+        
     }
 }
 //卸载应用
