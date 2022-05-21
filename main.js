@@ -204,7 +204,8 @@ ui.server_menu.on("item_bind", function (itemView, itemHolder) {
                 threads.start(function () {
                     if (checked) {
                         console.show();
-                        console.setPosition(0, d_height / 3);
+                        console.setPosition(d_width * 0.2, 0);
+
                     } else {
                         console.hide();
                     }
@@ -301,11 +302,10 @@ function gameThread() {
             exit();
         };
         for (index = 0; index < checkGameList.length; index++) {
-            console.log("执行第" + index + "个");
             element = checkGameList[index];
             appName = element.appName;
             packagenName = getPackageName(appName);
-            console.log("开始运行" + appName);
+            console.log("开始运行：" + appName);
             ui.run(function () {
                 runTime(parseInt(game.get(appName)));
             })
@@ -444,36 +444,38 @@ function 启点通用() {
     while (suspend) {
         isBackGame();
         img = captureScreen();
-        // if (frequency > 30) {
-        //     back();
-        //     back();
-        // }
+        if (frequency > 30) {
+            back(); 
+            back();
+        }
         point = findImage("启点通用", "withdrawal", 0.7, 0, 0, d_width, d_height);
         pressPoint(point, 50, 50);
         point = findImage("启点通用", "withdrawal2", 0.7, 0, 0, d_width, d_height);
         if (point != null) {
             pressPoint(point, 0, 0);
             frequency++;
-        } 
+        }
 
-        point = findImage("启点通用", "ok", 0.7, 0, 0, d_width, d_height);
+        point = findImage("启点通用", "ok", 0.6, 0, 0, d_width, d_height);
         pressPoint(point, 100, 100);
 
-        point = findImage("启点通用", "watch", 0.7, 0, 0, d_width, d_height);
+        point = findImage("启点通用", "watch", 0.6, 0, 0, d_width, d_height);
         pressPoint(point, 0, 0);
 
-        point = findImage("关闭广告", "read", 0.7, 0, 0, d_width, d_height);
+        point = findImage("关闭广告", "read", 0.6, 0, 0, d_width, d_height);
         if (point != null) {
             click(d_width / 4, d_height * 0.1);
         } else {
-            pressPoint(findImage("关闭广告", "close", 0.6, 0, 0, d_width, d_height), 0, 0);
+            point = findImage("关闭广告", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09);
+            pressPoint(point, 0, 0);
         }
+
         
         pressRect(findIdButton("ksad_kwad_web_navi_close"));
         pressRect(findTextButton("残忍离开"));
         pressRect(findTextButton("坚持退出"));
 
-        point = findImage("启点通用", "withdrawal3", 0.7, 0, 0, d_width, d_height);
+        point = findImage("启点通用", "withdrawal3", 0.6, 0, 0, d_width, d_height);
         if (point != null) {
             pressPoint(point, 100, 100);
         }
@@ -769,7 +771,6 @@ function closeData() {
 
 //初始化脚本列表数据
 function initData() {
-    console.log("初始化数据")
     var bmob = new Bmob("https://api2.bmob.cn/1", "a4a599f95c785c5dcc649a6973bfbc78", "90827b1b837cc3d1b02fde1b2d7b81da");
     threads.start(function () {
         ui.run(function () {
