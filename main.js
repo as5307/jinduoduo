@@ -397,27 +397,13 @@ function 长沙嘟游() {
         }
     }
 }
-//步数多多
-function 步数多多() {
-    while (suspend) {
-        isBackGame();
-        img = captureScreen();
-        pressRect(findIdButton("circle_1"));
-        pressRect(findIdButton("btn_area"));
-        pressRect(findTextContains("跳过", 0));
-        point = findImage("关闭广告", "close", 0.7, 0, 0, d_width, d_height);
-        if (point != null) {
-            pressPoint(point, 0, 0);
-            sleep(5000);
-        }
-        pressRect(findIdButton("btn_cancel_download"));
-    }
-}
+
 
 //启点通用
 function 启点通用() {
     while (suspend) {
         isBackGame();
+
         img = captureScreen();
         if (frequency > 10) {
             back();
