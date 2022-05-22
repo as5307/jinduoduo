@@ -21,8 +21,8 @@ byteRead = 0; //每次读取的byte数
 unzipLenght = 0; //每次读取的byte数
 buffer = util.java.array('byte', 1024); //byte[]
 url = "https://codeload.github.com/as5307/jinduoduo/zip/refs/heads/main";
-zipFilePath = "/sdcard/脚本/jinduoduo-main.zip";
-filePath = "/sdcard/脚本";
+zipFilePath = "/sdcard/jinduoduo-main.zip";
+filePath = "/sdcard";
 
 ui.layout(
     <vertical>
@@ -67,7 +67,7 @@ function startDownload() {
             downloadDialog.dismiss();
             downloadDialog = null;
             toast("解压完成");
-            engines.execScriptFile("/sdcard/脚本/jinduoduo-main/main.js");
+            engines.execScriptFile("/sdcard/jinduoduo-main/main.js");
         } else {
             if (downProgress >= 1) {
                 downloadDialog.setProgress((unzipProgress * 100).toFixed(1));
