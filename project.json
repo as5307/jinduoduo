@@ -16,7 +16,7 @@
     "splashText": "欢迎使用金多多挂机",
     "stableMode": false
   },
-  "main": "main.js",
+  "main": "splash.js",
   "name": "金多多挂机",
   "optimization": {
     "removeAccessibilityService": false,
