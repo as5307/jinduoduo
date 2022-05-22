@@ -18,7 +18,7 @@ var inputTime;
 var index;
 var suspend;
 wait = false;
-isRun = false;
+isRun = 0;
 
 d_width = device.width;
 d_height = device.height;
@@ -665,24 +665,34 @@ function initFloatDialog() {
 }
 //开始运行或者停止运行游戏
 function startOrStopGame() {
-    if (isRun) {
-        console.log("点击停止");
-        ui.startGame.setText("开始运行");;
-        rb.setIcon('@drawable/ic_play_arrow_black_48dp');
-        rb.setTint('#FFFFFF');
-        rb.setColor('#41A4F5');
-        suspend = false;
-        isRun = false;
-        wait = true;
-        closeCurrentPackage();
-    } else {
-        console.log("点击运行");
+    if (isRun == 0) {
+        // console.log("开始运行");
         if (checkGameList.length != 0) {
-            isRun = true;
+            isRun = 1;
             wait = false;
             suspend = true;
             ui.startGame.setText("停止运行");;
             gameThread();
+        } else {
+            toast("没有选择执行的脚本")
+        }
+    } else if (isRun == 1) {
+        // console.log("停止运行");
+        ui.startGame.setText("继续运行");;
+        rb.setIcon('@drawable/ic_play_arrow_black_48dp');
+        rb.setTint('#FFFFFF');
+        rb.setColor('#41A4F5');
+        suspend = false;
+        isRun = 2;
+        wait = true;
+        closeCurrentPackage();
+    } else {
+         // console.log("继续运行");
+         if (checkGameList.length != 0) {
+            isRun = 1;
+            wait = false;
+            suspend = true;
+            ui.startGame.setText("停止运行");;
         } else {
             toast("没有选择执行的脚本")
         }
@@ -833,7 +843,6 @@ function initKeyDown() {
 function isWait() {
     while (wait) {
         sleep(1000);
-        console.log("等待中。。。");
         index = 0;
     }
 }
