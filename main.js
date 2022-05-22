@@ -412,7 +412,7 @@ function 启点通用() {
             pressPoint(point, 100, 100);
             frequency++;
         }
-        point = findImage("启点通用", "withdrawal", 0.7, 0, 0, d_width, d_height);
+        point = findImage("启点通用", "withdrawal", 0.6, 0, 0, d_width, d_height);
         if (point != null) {
             pressPoint(point, 50, 50);
             frequency++;
@@ -438,7 +438,6 @@ function 启点通用() {
         if (point != null) {
             click(d_width / 4, d_height * 0.1);
         }
-
         point = findImage("关闭广告", "close", 0.6, d_width * 0.7, 0, d_width * 0.3, d_height);
         if (point != null) {
             pressPoint(point, 0, 0);
@@ -616,7 +615,7 @@ function findCustomizButton(b_className, b_depth, b_drawingOrder) {
 
 //找图方法
 function findImage(gameName, imgName, rate, s_width, s_height, r_width, r_height) {
-    var imgPath = "/sdcard/脚本/jinduoduo-main/res/" + gameName + "/" + imgName + ".jpg";
+    var imgPath = "/sdcard/jinduoduo-main/res/" + gameName + "/" + imgName + ".jpg";
     var templ = images.read(imgPath);
     point = images.findImage(img, templ, {
         threshold: rate,
@@ -817,9 +816,9 @@ function initStorages() {
 
 //引用资源
 function initRequire() {
-    require("/sdcard/脚本/jinduoduo-main/FloatButton/FloatButton.js");
-    Bmob = require("/sdcard/脚本/jinduoduo-main/bmob.js");
-    Game = require("/sdcard/脚本/jinduoduo-main/game.js");
+    require("/sdcard/jinduoduo-main/FloatButton/FloatButton.js");
+    Bmob = require("/sdcard/jinduoduo-main/bmob.js");
+    Game = require("/sdcard/jinduoduo-main/game.js");
 }
 
 //
