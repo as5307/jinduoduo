@@ -363,48 +363,49 @@ function 快手极速版() {
         }
     }
 }
-//长沙嘟游
-function 长沙嘟游() {
-    while (suspend) {
-        isBackGame();
-        img = captureScreen();
-        pressRect(findIdButton("btn"));
-        pressRect(findTextContains("允许", 1));
-        pressRect(findCustomizButton("红包群", 10, 1));
-        pressRect(findCustomizButton("世界群", 12, 3));
+// //长沙嘟游
+// function 长沙嘟游() {
+//     while (suspend) {
+//         isBackGame();
+//         img = captureScreen();
+//         pressRect(findIdButton("btn"));
+//         pressRect(findTextContains("允许", 1));
+//         pressRect(findCustomizButton("红包群", 10, 1));
+//         pressRect(findCustomizButton("世界群", 12, 3));
 
-        pressRect(findIdButton("text_switcher"));
+//         pressRect(findIdButton("text_switcher"));
 
-        point = findImage("长沙嘟游", "redenvelope", 0.6, 0, 0, d_width, d_height);
-        pressPoint(point, 0, 0);
+//         point = findImage("长沙嘟游", "redenvelope", 0.6, 0, 0, d_width, d_height);
+//         pressPoint(point, 0, 0);
 
-        if (findIdButton("getRedBagRl") != null) {
-            sleep(5000);
-            pressRect(findIdButton("getRedBagRl"));
-        }
+//         if (findIdButton("getRedBagRl") != null) {
+//             sleep(5000);
+//             pressRect(findIdButton("getRedBagRl"));
+//         }
 
-        point = findImage("关闭广告", "read", 0.6, 0, 0, d_width, d_height);
+//         point = findImage("关闭广告", "read", 0.6, 0, 0, d_width, d_height);
 
-        if (point != null) {
-            click(d_width / 4, d_height * 0.1);
-        }
-        point = findImage("关闭广告", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09);
-        pressPoint(point, 0, 0);
+//         if (point != null) {
+//             click(d_width / 4, d_height * 0.1);
+//         }
+//         point = findImage("关闭广告", "close", 0.6, d_width * 0.85, 0, d_width * 0.15, d_height * 0.09);
+//         pressPoint(point, 0, 0);
 
 
-        if (findIdButton("sure") != null || findTextButton("坚持退出") != null) {
-            pressRect(findIdButton("sure"));
-            closeData();
-        }
-    }
-}
+//         if (findIdButton("sure") != null || findTextButton("坚持退出") != null) {
+//             pressRect(findIdButton("sure"));
+//             closeData();
+//         }
+//     }
+// }
 
 
 //启点通用
 function 启点通用() {
     while (suspend) {
         isBackGame();
-    
+        img=captureScreen();
+        images.saveImage(img,bigImgPath);
         if (frequency > 10) {
             back();
             back();
@@ -436,11 +437,13 @@ function 启点通用() {
             frequency++;
         }
 
+
         point = findImage("关闭广告", "read", 0.6, 0, 0, d_width, d_height);
         if (point != null) {
             click(d_width / 4, d_height * 0.1);
         }
-        point = findImage("关闭广告", "close", 0.6, d_width * 0.7, 0, d_width * 0.3, d_height);
+        point = findImage("关闭广告", "close", 0.
+        , d_width * 0.7, 0, d_width * 0.3, d_height);
         if (point != null) {
             pressPoint(point, 0, 0);
             frequency = 0;
@@ -579,7 +582,7 @@ function compare(key) {
 function findIdButton(b_id) {
     rect = id(b_id).findOnce();
     if (rect != null) {
-        console.log("找到id控件" + b_id + "坐标" + "：" + "(" + rect.bounds().centerX() + "," + rect.bounds().centerY() + ")");
+        console.log("找到id控件："+"坐标" + "：" + "(" + rect.bounds().centerX() + "," + rect.bounds().centerY() + ")");
         return rect
     }
     return null;
@@ -589,35 +592,33 @@ function findIdButton(b_id) {
 function findTextButton(b_text) {
     rect = text(b_text).findOnce();
     if (rect != null) {
-        console.log("找到控件" + b_text + "坐标" + "：" + "(" + rect.bounds().centerX() + "," + rect.bounds().centerY() + ")");
+        console.log("找到“+b_text+”控件：" + "坐标" + "：" + "(" + rect.bounds().centerX() + "," + rect.bounds().centerY() + ")");
         return rect;
     }
     return null
 }
 
-function findTextContains(str, i) {
-    rect = textContains(str).findOnce(i);
+function findTextContains(b_text, i) {
+    rect = textContains(b_text).findOnce(i);
     if (rect != null) {
-        console.log("找到匹配控件");
+        console.log("找到“+b_text+”匹配控件："+"坐标" + "：" + "(" + rect.bounds().centerX() + "," + rect.bounds().centerY() + ")");
         return rect;
     }
     return null;
 }
 
-//根据属性className、classNane、drawOrder找控件点击
-function findCustomizButton(b_className, b_depth, b_drawingOrder) {
-    rect = className(b_className).depth(b_depth).drawingOrder(b_drawingOrder).findOnce();
-    if (rect != null) {
-        console.log("找到控件坐标" + "(" + rect.bounds().centerX() + "," + rect.bounds().centerY() + ")");
-        return rect;
-    }
-    return null;
-}
+// //根据属性className、classNane、drawOrder找控件点击
+// function findCustomizButton(b_className, b_depth, b_drawingOrder) {
+//     rect = className(b_className).depth(b_depth).drawingOrder(b_drawingOrder).findOnce();
+//     if (rect != null) {
+//         console.log("找到控件坐标" + "(" + rect.bounds().centerX() + "," + rect.bounds().centerY() + ")");
+//         return rect;
+//     }
+//     return null;
+// }
 
 //找图方法
 function findImage(gameName, imgName, rate, s_width, s_height, r_width, r_height) {
-    img=captureScreen();
-    images.saveImage(img,bigImgPath);
     var imgPath = "/sdcard/jinduoduo-main/res/" + gameName + "/" + imgName + ".jpg";
     var templ = images.read(imgPath);
     var bigImg=images.read(bigImgPath)
