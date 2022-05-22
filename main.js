@@ -104,6 +104,7 @@ ui.layout(
                             <card w="*" h="55" margin="10 5" cardCornerRadius="2dp" layout_gravity="center" id="gameCard"  >
                                 <horizontal h="*" >
                                     <View bg="#4caf50" h="*" w="10" />
+                                    {/* <radio textSize="15" id="game1" text="{{this.appName}}" layout_gravity="center" layout_weight="1"/> */}
                                     <checkbox id="game1" textSize="15" text="{{this.appName}}" layout_gravity="center" layout_weight="1" />
                                     <text text="运行" />
                                     <input inputType="number" id="inputTime" text="30" />
@@ -313,16 +314,7 @@ function gameThread() {
                 case "快手极速版":
                     快手极速版();
                     break;
-                case "最强答题王":
-                    最强答题王();
-                    break;
-                case "步数多多":
-                    步数多多();
-                    break;
                 case "薅到你破产":
-                    启点通用();
-                    break;
-                case "盲猜成语":
                     启点通用();
                     break;
                 case "消除高手":
@@ -334,7 +326,7 @@ function gameThread() {
                 case "逆袭之王":
                     启点通用();
                     break;
-    
+
             }
             isWait();
         }
@@ -405,30 +397,6 @@ function 长沙嘟游() {
         }
     }
 }
-//最强答题王
-function 最强答题王() {
-    while (suspend) {
-        isBackGame();
-        img = captureScreen();
-
-        pressRect(findTextContains("跳过", 0));
-
-        point = findImage("最强答题王", "redenvelope", 0.6, 0, 0, d_width, d_height);
-        pressPoint(point, 50, 50);
-
-        point = findImage("关闭广告", "read", 0.6, 0, 0, d_width, d_height);
-        if (point != null) {
-            click(d_width / 4, d_height * 0.1);
-        }
-
-        point = findImage("关闭广告", "close", 0.6, 0, 0, d_width, d_height);
-        pressPoint(point, 0, 0);
-
-        pressRect(findIdButton("ksad_kwad_web_navi_close"));
-        pressRect(findTextButton("残忍离开"));
-    }
-}
-
 //步数多多
 function 步数多多() {
     while (suspend) {
@@ -451,42 +419,55 @@ function 启点通用() {
     while (suspend) {
         isBackGame();
         img = captureScreen();
-        // if (frequency > 3) {
-        //     back();
-        //     back();
-        // }
+        if (frequency > 10) {
+            back();
+            back();
+        }
         point = findImage("启点通用", "start", 0.6, 0, 0, d_width, d_height);
-        pressPoint(point, 100, 100);
-
+        if (point != null) {
+            pressPoint(point, 100, 100);
+            frequency++;
+        }
         point = findImage("启点通用", "withdrawal", 0.7, 0, 0, d_width, d_height);
-        pressPoint(point, 50, 50);
+        if (point != null) {
+            pressPoint(point, 50, 50);
+            frequency++;
+        }
 
-        point = findImage("启点通用", "withdrawal2", 0.7, 0, 0, d_width, d_height/2);
+        point = findImage("启点通用", "withdrawal2", 0.7, 0, 0, d_width, d_height / 2);
         if (point != null) {
             pressPoint(point, 0, 0);
-            // frequency++;
+            frequency++;
         }
 
         point = findImage("启点通用", "ok", 0.6, 0, 0, d_width, d_height);
         pressPoint(point, 100, 100);
 
+
         point = findImage("启点通用", "watch", 0.6, 0, 0, d_width, d_height);
-        pressPoint(point, 0, 0); 
+        if (point != null) {
+            pressPoint(point, 0, 0);
+            frequency++;
+        }
 
         point = findImage("关闭广告", "read", 0.6, 0, 0, d_width, d_height);
         if (point != null) {
             click(d_width / 4, d_height * 0.1);
-        } else {
-            point = findImage("关闭广告", "close", 0.6, d_width * 0.7, 0, d_width * 0.3, d_height /2);
-            pressPoint(point, 0, 0);
         }
+
+        point = findImage("关闭广告", "close", 0.6, d_width * 0.7, 0, d_width * 0.3, d_height);
+        if (point != null) {
+            pressPoint(point, 0, 0);
+            frequency = 0;
+        }
+
         point = findImage("启点通用", "withdrawal3", 0.6, 0, 0, d_width, d_height);
         if (point != null) {
             pressPoint(point, 100, 100);
-            sleep(5000);
+            frequency++;
         }
 
-        if (findTextButton("应用详情")!=null) {
+        if (findTextButton("应用详情") != null || findTextButton("点击查看详情") != null) {
             back();
         }
 
@@ -494,8 +475,7 @@ function 启点通用() {
         pressRect(findTextButton("残忍离开"));
         pressRect(findTextButton("坚持退出"));
         pressRect(findTextContains("跳过", 0));
-     
-        
+
     }
 }
 //卸载应用
@@ -519,89 +499,98 @@ ui.gameList.on("item_bind", function (itemView, itemHolder) {
         var position = itemHolder.position;
         if (checked) {
             pattern = ui.spl.getSelectedItemPosition();
-            for (let index = 0; index < gameList.length; index++) {
-                if (pattern == 0) {
-                    if (index == position) {
-                        checkGameList.splice(0, 0, gameList[position]);
-                    }
-                } else {
-                    if (index == position) {
-                        checkGameList.splice(index, 0, gameList[position]);
-                    }
-                }
-            }
+            checkGameList.splice(position, 0, gameList[position]);
+            //对象数组进行排序
+            checkGameList =checkGameList.sort(compare("serial"));
+            console.log(checkGameList);
         } else {
-            console.log("取消勾选");
-            for (let index = 0; index < gameList.length; index++) {
-                if (index == position) {
-                    checkGameList.splice(index, 1);
+            if (checkGameList.length >= 1) {
+                for (let index = 0; index < checkGameList.length; index++) {
+                    if (checkGameList[index].appName == gameList[position].appName) {
+                        checkGameList.splice(index, 1);
+                    }
                 }
-            }
+            } 
+            console.log(checkGameList);
+
         }
     })
 
-    itemView.longBottom.on("click", () => {
-        var position = itemHolder.position;
-        if (gameList[position].isClickable) {
-            toast("已经安装")
-        } else {
-            if (running) {
-                toast("已经在安装中")
-                return
-            }
-            // if (files.exists(filePath)) {
-            //     ui.longBottom.text("下载完成")
-            //     gradientDrawable.setColors(colorArr, [1, 0]);
-            //     ui.longBottom.setBackground(gradientDrawable);
-            //     app.viewFile(filePath)
-            //     return
-            // }
-            // toast("注意你的流量哦")
-            progress = 0
-            running = true
-            //开始下载
-            let setProgress = setInterval(() => {
-                itemView.longBottom.text((progress * 100).toFixed(1) + "%")
-                if (progress >= 1) {
-                    running = false
-                    clearInterval(setProgress)
-                    toast("下载完成");
+    // itemView.longBottom.on("click", () => {
+    //     var position = itemHolder.position;
+    //     if (gameList[position].isClickable) {
+    //         toast("已经安装")
+    //     } else {
+    //         if (running) {
+    //             toast("已经在安装中")
+    //             return
+    //         }
+    //         // if (files.exists(filePath)) {
+    //         //     ui.longBottom.text("下载完成")
+    //         //     gradientDrawable.setColors(colorArr, [1, 0]);
+    //         //     ui.longBottom.setBackground(gradientDrawable);
+    //         //     app.viewFile(filePath)
+    //         //     return
+    //         // }
+    //         // toast("注意你的流量哦")
+    //         progress = 0
+    //         running = true
+    //         //开始下载
+    //         let setProgress = setInterval(() => {
+    //             itemView.longBottom.text((progress * 100).toFixed(1) + "%")
+    //             if (progress >= 1) {
+    //                 running = false
+    //                 clearInterval(setProgress)
+    //                 toast("下载完成");
 
-                    //读入文件
-                    var newApkFile = new File(filePath);
-                    var intent = new Intent(Intent.ACTION_VIEW);
-                    intent.addCategory(Intent.CATEGORY_DEFAULT);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    var type = "application/vnd.android.package-archive";
-                    var uri;
-                    if (device.sdkInt > 23) {
-                        //创建url
-                        uri = Packages["androidx"].core.content.FileProvider.getUriForFile(context, app.fileProviderAuthority, newApkFile);
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    } else {
-                        uri = Uri.fromFile(newApkFile);
-                    }
-                    intent.setDataAndType(uri, type);
-                    app.startActivity(intent);
-                }
-            }, 20)
+    //                 //读入文件
+    //                 var newApkFile = new File(filePath);
+    //                 var intent = new Intent(Intent.ACTION_VIEW);
+    //                 intent.addCategory(Intent.CATEGORY_DEFAULT);
+    //                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    //                 var type = "application/vnd.android.package-archive";
+    //                 var uri;
+    //                 if (device.sdkInt > 23) {
+    //                     //创建url
+    //                     uri = Packages["androidx"].core.content.FileProvider.getUriForFile(context, app.fileProviderAuthority, newApkFile);
+    //                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    //                 } else {
+    //                     uri = Uri.fromFile(newApkFile);
+    //                 }
+    //                 intent.setDataAndType(uri, type);
+    //                 app.startActivity(intent);
+    //             }
+    //         }, 20)
 
-            threads.start(function () {
-                filePath = files.path("./" + gameList[position].appName + ".apk");
-                var myUrl = new URL(gameList[position].url);
-                var conn = myUrl.openConnection(); //URLConnection
-                inStream = conn.getInputStream(); //InputStream
-                fs = new FileOutputStream(filePath); //FileOutputStream
-                connLength = conn.getContentLength(); //int
-                while ((byteRead = inStream.read(buffer)) != -1) {
-                    byteSum += byteRead;
-                    fs.write(buffer, 0, byteRead); //读取
-                    progress = byteSum / connLength;
-                }
-            })
-        }
-    })
+    //         threads.start(function () {
+    //             filePath = files.path("./" + gameList[position].appName + ".apk");
+    //             var myUrl = new URL(gameList[position].url);
+    //             var conn = myUrl.openConnection(); //URLConnection
+    //             inStream = conn.getInputStream(); //InputStream
+    //             fs = new FileOutputStream(filePath); //FileOutputStream
+    //             connLength = conn.getContentLength(); //int
+    //             while ((byteRead = inStream.read(buffer)) != -1) {
+    //                 byteSum += byteRead;
+    //                 fs.write(buffer, 0, byteRead); //读取
+    //                 progress = byteSum / connLength;
+    //             }
+    //         })
+    //     }
+    // })
 })
+
+function compare(key){
+	return function(a,b){
+		var c=a[key];
+		var d=b[key];
+		if(c<d){
+			return 1
+		}else{
+			return -1
+		}
+	}
+}
+
 //根据id找控件点击
 function findIdButton(b_id) {
     rect = id(b_id).findOnce();
@@ -798,9 +787,9 @@ function initData() {
             var element = result[index];
             game.put(element.appName, "30");
             if (getPackageName(element.appName) == null) {
-                noDownGameList.push(new Game(element.appName, element.url));
+                noDownGameList.push(new Game(element.appName, element.url, element.serial));
             } else {
-                downGameList.push(new Game(element.appName, element.url));
+                downGameList.push(new Game(element.appName, element.url, element.serial));
             }
         }
         for (var i = 0; i < downGameList.length; i++) {
