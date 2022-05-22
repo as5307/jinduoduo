@@ -20,6 +20,7 @@ var suspend;
 wait = false;
 isRun = 0;
 
+
 d_width = device.width;
 d_height = device.height;
 
@@ -27,6 +28,7 @@ var point;
 var rect;
 bigImgPath="/sdcard/jinduoduo-main/res/截屏/jieping.jpg";
 listView = [];
+
 serverItemView = [];
 initStorages();
 
@@ -402,8 +404,7 @@ function 长沙嘟游() {
 function 启点通用() {
     while (suspend) {
         isBackGame();
-        img=captureScreen();
-        images.saveImage(img,bigImgPath);
+    
         if (frequency > 10) {
             back();
             back();
@@ -615,6 +616,8 @@ function findCustomizButton(b_className, b_depth, b_drawingOrder) {
 
 //找图方法
 function findImage(gameName, imgName, rate, s_width, s_height, r_width, r_height) {
+    img=captureScreen();
+    images.saveImage(img,bigImgPath);
     var imgPath = "/sdcard/jinduoduo-main/res/" + gameName + "/" + imgName + ".jpg";
     var templ = images.read(imgPath);
     var bigImg=images.read(bigImgPath)
