@@ -295,14 +295,12 @@ function gameThread() {
     runThread = threads.start(function () {
         var element;
         auto.waitFor();
-        rb.setIcon('@drawable/ic_stop_black_48dp');
-        rb.setTint('#FFFFFF');
-        rb.setColor('#ED524E');
         if (!requestScreenCapture()) {
             console.log("请求截图失败");
             exit();
         };
-        for (index = 0; index < checkGameList.length; index++) {
+        for (index = 0; index < checkGameList.length; ) {
+            console.log("index"+index)
             element = checkGameList[index];
             appName = element.appName;
             packagenName = getPackageName(appName);
@@ -668,10 +666,13 @@ function startOrStopGame() {
     if (isRun == 0) {
         // console.log("开始运行");
         if (checkGameList.length != 0) {
+            ui.startGame.setText("停止运行");
+            rb.setIcon('@drawable/ic_stop_black_48dp');
+            rb.setTint('#FFFFFF');
+            rb.setColor('#ED524E');
             isRun = 1;
             wait = false;
             suspend = true;
-            ui.startGame.setText("停止运行");;
             gameThread();
         } else {
             toast("没有选择执行的脚本")
@@ -689,10 +690,13 @@ function startOrStopGame() {
     } else {
          // console.log("继续运行");
          if (checkGameList.length != 0) {
+            ui.startGame.setText("停止运行");
+            rb.setIcon('@drawable/ic_stop_black_48dp');
+            rb.setTint('#FFFFFF');
+            rb.setColor('#ED524E');
             isRun = 1;
             wait = false;
             suspend = true;
-            ui.startGame.setText("停止运行");;
         } else {
             toast("没有选择执行的脚本")
         }
@@ -844,7 +848,9 @@ function isWait() {
     while (wait) {
         sleep(1000);
         index = 0;
+        // console.log("等待中。。")
     }
+    // console.log("退出");
 }
 /**
  * 屏幕滑动
