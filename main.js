@@ -487,7 +487,7 @@ ui.gameList.on("item_bind", function (itemView, itemHolder) {
             pattern = ui.spl.getSelectedItemPosition();
             checkGameList.splice(position, 0, gameList[position]);
             //对象数组进行排序
-            checkGameList =checkGameList.sort(compare("serial"));
+            checkGameList = checkGameList.sort(compare("serial"));
             console.log(checkGameList);
         } else {
             if (checkGameList.length >= 1) {
@@ -496,7 +496,7 @@ ui.gameList.on("item_bind", function (itemView, itemHolder) {
                         checkGameList.splice(index, 1);
                     }
                 }
-            } 
+            }
             console.log(checkGameList);
 
         }
@@ -565,16 +565,16 @@ ui.gameList.on("item_bind", function (itemView, itemHolder) {
     // })
 })
 
-function compare(key){
-	return function(a,b){
-		var c=a[key];
-		var d=b[key];
-		if(c<d){
-			return 1
-		}else{
-			return -1
-		}
-	}
+function compare(key) {
+    return function (a, b) {
+        var c = a[key];
+        var d = b[key];
+        if (c < d) {
+            return 1
+        } else {
+            return -1
+        }
+    }
 }
 
 //根据id找控件点击
@@ -651,7 +651,7 @@ function pressRect(rect) {
 function initFloatDialog() {
     //悬浮框
     fb = new FloatButton();
-    fb.setIcon('http://www.autojs.org/assets/uploads/profile/3-profileavatar.png');
+    // fb.setIcon('http://www.autojs.org/assets/uploads/profile/3-profileavatar.png');
     fb.setAllButtonSize(50)
     rb = fb.addItem('run');
     rb.setIcon('@drawable/ic_play_arrow_black_48dp');
@@ -738,12 +738,15 @@ function initAutoDialog() {
 //强制关闭应用
 function closeCurrentPackage() {
     threads.start(function () {
-        app.openAppSetting(packageName);
-        text(app.getAppName(packageName)).waitFor();
+        var packname = getPackageName(appName);
+        app.openAppSetting(packname);
         pressRect(findTextButton("强行停止"));
+        pressRect(findTextButton("结束运行"));
         sleep(1000);
         pressRect(findTextButton("强行停止"));
+        pressRect(findTextButton("确定"));
         sleep(1000);
+        app.launchPackage("com.jinduoduo.guaji");
     })
 }
 
@@ -757,8 +760,7 @@ function closeData() {
     pressRect(findTextButton("删除数据"));
     sleep(2000);
     pressRect(findTextButton("确定"));
-    sleep("5000");
-    back();
+    sleep("5000")
 }
 
 //初始化脚本列表数据
