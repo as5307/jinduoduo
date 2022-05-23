@@ -26,7 +26,7 @@ d_height = device.height;
 
 var point;
 var rect;
-bigImgPath="/sdcard/jinduoduo-main/res/截屏/jieping.jpg";
+bigImgPath = "/sdcard/jinduoduo-main/res/截屏/jieping.jpg";
 listView = [];
 
 serverItemView = [];
@@ -302,8 +302,8 @@ function gameThread() {
             console.log("请求截图失败");
             exit();
         };
-        for (index = 0; index < checkGameList.length; ) {
-            console.log("index"+index)
+        for (index = 0; index < checkGameList.length;) {
+            console.log("index" + index)
             element = checkGameList[index];
             appName = element.appName;
             packagenName = getPackageName(appName);
@@ -326,6 +326,9 @@ function gameThread() {
                     break;
                 case "逆袭之王":
                     启点通用();
+                    break;
+                case "开心消消消":
+                    开心消消消();
                     break;
 
             }
@@ -404,8 +407,8 @@ function 快手极速版() {
 function 启点通用() {
     while (suspend) {
         isBackGame();
-        img=captureScreen();
-        images.saveImage(img,bigImgPath);
+        img = captureScreen();
+        images.saveImage(img, bigImgPath);
         if (frequency > 10) {
             back();
             back();
@@ -437,13 +440,12 @@ function 启点通用() {
             frequency++;
         }
 
-
         point = findImage("关闭广告", "read", 0.6, 0, 0, d_width, d_height);
         if (point != null) {
             click(d_width / 4, d_height * 0.1);
+
         }
-        point = findImage("关闭广告", "close", 0.
-        , d_width * 0.7, 0, d_width * 0.3, d_height);
+        point = findImage("关闭广告", "close", 0.6, d_width * 0.7, 0, d_width * 0.3, d_height);
         if (point != null) {
             pressPoint(point, 0, 0);
             frequency = 0;
@@ -459,6 +461,43 @@ function 启点通用() {
         }
 
         pressRect(findIdButton("ksad_kwad_web_navi_close"));
+        pressRect(findTextButton("残忍离开"));
+        pressRect(findTextButton("坚持退出"));
+        pressRect(findTextContains("跳过", 0));
+
+    }
+}
+
+//开心消消乐
+function 开心消消消() {
+    while (suspend) {
+        isBackGame();
+        img = captureScreen();
+        images.saveImage(img, bigImgPath);
+        point = findImage("开心消消消", "redenvelope", 0.6, 0, 0, d_width, d_height);
+        pressPoint(point, 0, 0);
+
+        point = findImage("开心消消消", "receive", 0.6, 0, 0, d_width, d_height);
+        pressPoint(point, 100, 100);
+
+        point = findImage("关闭广告", "read", 0.6, 0, 0, d_width, d_height);
+        if (point != null) {
+            click(d_width / 4, d_height * 0.1);
+        }
+        point = findImage("关闭广告", "close", 0.6, d_width * 0.7, 0, d_width * 0.3, d_height);
+        pressPoint(point, 0, 0);
+        
+        point = findImage("关闭广告", "close2", 0.8, d_width * 0.7, 0, d_width * 0.3, d_height);
+        pressPoint(point, 50, 50);    
+        
+        point = findImage("开心消消消", "accept", 0.6, 0, 0, d_width, d_height);
+        pressPoint(point, 100, 100);  
+
+        if (findTextButton("应用详情") != null || findTextButton("点击查看详情") != null) {
+            back();
+        }
+        pressRect(findIdButton("ksad_kwad_web_navi_close"));
+        pressRect(findIdButton("tt_bu_close"));
         pressRect(findTextButton("残忍离开"));
         pressRect(findTextButton("坚持退出"));
         pressRect(findTextContains("跳过", 0));
@@ -582,7 +621,7 @@ function compare(key) {
 function findIdButton(b_id) {
     rect = id(b_id).findOnce();
     if (rect != null) {
-        console.log("找到id控件："+"坐标" + "：" + "(" + rect.bounds().centerX() + "," + rect.bounds().centerY() + ")");
+        console.log("找到id控件：" + "坐标" + "：" + "(" + rect.bounds().centerX() + "," + rect.bounds().centerY() + ")");
         return rect
     }
     return null;
@@ -601,7 +640,7 @@ function findTextButton(b_text) {
 function findTextContains(b_text, i) {
     rect = textContains(b_text).findOnce(i);
     if (rect != null) {
-        console.log("找到“+b_text+”匹配控件："+"坐标" + "：" + "(" + rect.bounds().centerX() + "," + rect.bounds().centerY() + ")");
+        console.log("找到“+b_text+”匹配控件：" + "坐标" + "：" + "(" + rect.bounds().centerX() + "," + rect.bounds().centerY() + ")");
         return rect;
     }
     return null;
@@ -621,7 +660,7 @@ function findTextContains(b_text, i) {
 function findImage(gameName, imgName, rate, s_width, s_height, r_width, r_height) {
     var imgPath = "/sdcard/jinduoduo-main/res/" + gameName + "/" + imgName + ".jpg";
     var templ = images.read(imgPath);
-    var bigImg=images.read(bigImgPath)
+    var bigImg = images.read(bigImgPath)
     point = images.findImage(bigImg, templ, {
         threshold: rate,
         region: [s_width, s_height, r_width, r_height]
@@ -692,8 +731,8 @@ function startOrStopGame() {
         wait = true;
         closeCurrentPackage();
     } else {
-         // console.log("继续运行");
-         if (checkGameList.length != 0) {
+        // console.log("继续运行");
+        if (checkGameList.length != 0) {
             ui.startGame.setText("停止运行");
             rb.setIcon('@drawable/ic_stop_black_48dp');
             rb.setTint('#FFFFFF');
@@ -726,7 +765,6 @@ function runTime(timeout) {
         }
     }, 1000);
 }
-
 //初始化无障碍弹窗
 function initAutoDialog() {
     autoDialog = dialogs.build({
